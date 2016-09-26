@@ -38,9 +38,11 @@ sourceSets {
 }
 
 publish {
-    userOrg = 'novoda'
+    userOrg = 'tw'
     groupId = 'com.taskworld.kraph'
     artifactId = 'kraph'
+    bintrayUser = "$System.env.BINTRAY_USER"
+    bintrayKey = "$System.env.BINTRAY_API_KEY"
     publishVersion = "$publish_version"
     licences = ['MIT']
     desc = 'GraphQL query builder written in Kotlin'
