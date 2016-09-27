@@ -11,12 +11,25 @@ class KraphQL(f: KraphQL.() -> Unit) {
         f.invoke(this)
     }
 
-    fun query(name: String = "", builder: FieldBuilder.() -> Unit) {
+    fun query(name: String? = null , builder: FieldBuilder.() -> Unit) {
         document = DocumentNode(OperationNode(OperationType.QUERY, fields = FieldBuilder().apply(builder).fields, name = name))
+    }
+
+    fun mutation(name: String? = null, builder: MutationBuilder.() -> Unit) {
+        document = DocumentNode(OperationNode(OperationType.MUTATION, fields = MutationBuilder().apply(builder).mutations, name = name))
     }
 
     override fun toString(): String {
         return document.print()
+    }
+
+    inner class MutationBuilder() {
+        internal val mutations = arrayListOf<MutationNode>()
+
+        fun func(name: String, args: Map<String, Any>, builder: FieldBuilder.() -> Unit) {
+            mutations += MutationNode(name, MutationArgumentNode(args), selectionSet(builder))
+        }
+
     }
 
     inner class FieldBuilder() {
@@ -32,17 +45,18 @@ class KraphQL(f: KraphQL.() -> Unit) {
         }
 
         private fun addField(name: String, params: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)? = null) {
-            val args = params?.let { ArgumentsNode(it) }
+            val args = params?.let(::ArgumentNode)
             selectionSet = builder?.let {
                 selectionSet(builder)
             }
             fields += FieldNode(name, arguments = args, selectionSet = selectionSet)
         }
 
-        private fun selectionSet(f: FieldBuilder.() -> Unit): SelectionSetNode {
-            val builder = FieldBuilder().apply(f)
-            return SelectionSetNode(builder.fields)
-        }
+    }
+
+    private fun selectionSet(f: FieldBuilder.() -> Unit): SelectionSetNode {
+        val builder = FieldBuilder().apply(f)
+        return SelectionSetNode(builder.fields)
     }
 
 }

@@ -1,5 +1,7 @@
 package com.taskworld.kraph
 
+import com.sun.javadoc.FieldDoc
+
 /**
  * Created by VerachadW on 9/19/2016 AD.
  */
@@ -25,7 +27,7 @@ internal class SelectionSetNode(internal val fields: List<FieldNode>) : Node {
 }
 
 internal class OperationNode(internal val type: OperationType, internal val fields: List<FieldNode>,
-                             internal val name: String? = null, internal val arguments: ArgumentsNode? = null): Node {
+                             internal val name: String? = null, internal val arguments: ArgumentNode? = null): Node {
 
     override fun print(): String {
         val namePart = name?.let { " " + it } ?: ""
@@ -34,37 +36,52 @@ internal class OperationNode(internal val type: OperationType, internal val fiel
     }
 }
 
-internal class ArgumentsNode(internal val args: Map<String, Any> = mapOf()) : Node {
+internal open class ArgumentNode(internal val args: Map<String, Any> = mapOf()) : Node {
+
+    operator fun get(key: String): Any? = args[key]
+    fun size(): Int = args.size
 
     override fun print(): String {
-        return "(${args.entries.foldIndexed(""){ index, acc, entry ->
-            var string = acc + "${entry.key}: ${
-                if(entry.value is String) {
-                   "\"" + entry.value +"\""
-                } else {
-                    entry.value
-                }
-            }"
-            if (index != args.size - 1) {
-                string += ", "
-            }
-            string
-        }})"
+        return "(${args.print()})"
     }
-
 }
 
-internal class FieldNode(internal val name: String, internal val arguments: ArgumentsNode? = null, internal val selectionSet: SelectionSetNode? = null): Node {
+internal open class FieldNode(internal val name: String, internal val arguments: ArgumentNode? = null, internal val selectionSet: SelectionSetNode? = null): Node {
     override fun print(): String {
         val selectionSetPart = selectionSet?.let { " " + it.print() } ?: ""
         return "$name${ arguments?.print() ?: "" }$selectionSetPart"
     }
 }
 
-fun <T: Node> List<T>.print() =
+internal class MutationNode(name: String, arguments: MutationArgumentNode, selectionSet: SelectionSetNode) : FieldNode(name, arguments, selectionSet)
+
+internal class MutationArgumentNode(args: Map<String, Any>) : ArgumentNode(args) {
+    override fun print(): String {
+        return "(input: { ${args.print()} })"
+    }
+}
+
+internal fun <T: Node> List<T>.print() =
     this.fold(""){ acc, node ->
         acc + node.print() + "\r\n"
     }
+
+internal fun Map<String, Any>.print() =
+        this.entries.foldIndexed(""){ index, acc, entry ->
+            var string = acc + "${entry.key}: ${
+            when(entry.value) {
+                is String -> {
+                    "\"" + entry.value + "\""
+                }
+                else ->{
+                    entry.value
+                }
+            }}"
+            if (index != this.size - 1) {
+                string += ", "
+            }
+            string
+        }
 
 internal enum class OperationType {
     QUERY,
