@@ -4,7 +4,7 @@ package com.taskworld.kraph
  * Created by VerachadW on 9/19/2016 AD.
  */
 
-class QL(f: QL.() -> Unit) {
+class KraphQL(f: KraphQL.() -> Unit) {
     internal lateinit var document: DocumentNode
 
     init {

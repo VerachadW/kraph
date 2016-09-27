@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.isA
 import com.taskworld.kraph.OperationType
-import com.taskworld.kraph.QL
+import com.taskworld.kraph.KraphQL
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
@@ -19,9 +19,9 @@ import org.junit.runner.RunWith
  */
 @RunWith(JUnitPlatform::class)
 class LangSpek : Spek({
-    describe("Kraph Query DSL Builder") {
+    describe("KraphQL Query DSL Builder") {
         given("smaple query") {
-            val query = QL {
+            val query = KraphQL {
                 query("getAllNotes") {
                     fieldObject("notes") {
                         field("id")

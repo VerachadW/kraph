@@ -19,10 +19,10 @@ class NodePrintSpek : Spek({
                 assertThat(node.print(), equalTo("(id: 1)"))
             }
         }
-        given("\"id\" and \"title\" as arguments and value as 1 and \"Kraph\"") {
-            val node = ArgumentsNode(mapOf("id" to 1, "title" to "Kraph"))
-            it("should print (id: 1, title: \"Kraph\")") {
-                assertThat(node.print(), equalTo("(id: 1, title: \"Kraph\")"))
+        given("\"id\" and \"title\" as arguments and value as 1 and \"KraphQL\"") {
+            val node = ArgumentsNode(mapOf("id" to 1, "title" to "KraphQL"))
+            it("should print (id: 1, title: \"KraphQL\")") {
+                assertThat(node.print(), equalTo("(id: 1, title: \"KraphQL\")"))
             }
         }
     }
