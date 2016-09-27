@@ -1,15 +1,6 @@
 buildscript {
     ext {
-        publish_version = '0.1.0'
-
-        bintray_plugin_version = '0.3.4'
-
-        kotlin_version = '1.0.3'
-        spek_version = '1.0.89'
-        hamkrest_version = '1.2.2.0'
-        junit_version = '4.12'
-        junit_platform_version = '1.0.0-M2'
-
+        kotlin_version = '1.0.4'
     }
     repositories {
         mavenCentral()
@@ -17,43 +8,5 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.junit.platform:junit-platform-gradle-plugin:$junit_platform_version"
-        classpath "org.junit.platform:junit-platform-runner:$junit_platform_version"
-        classpath "com.novoda:bintray-release:$bintray_plugin_version"
     }
-}
-
-apply plugin: 'kotlin'
-apply plugin: 'com.novoda.bintray-release'
-
-archivesBaseName = 'kraph'
-version = "v.$publish_version"
-
-repositories {
-    mavenCentral()
-}
-
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-}
-
-publish {
-    userOrg = 'tw'
-    groupId = 'com.taskworld.kraph'
-    artifactId = 'kraph'
-    bintrayUser = "$System.env.BINTRAY_USER"
-    bintrayKey = "$System.env.BINTRAY_API_KEY"
-    publishVersion = "$publish_version"
-    licences = ['MIT']
-    desc = 'GraphQL query builder written in Kotlin'
-    website = 'https://github.com/taskworld/kraph'
-}
-
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    testCompile "junit:junit:$junit_version"
-    testCompile "com.natpryce:hamkrest:$hamkrest_version"
-    testCompile "org.jetbrains.spek:spek-api:$spek_version"
-    testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spek_version"
-    testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version"
 }
