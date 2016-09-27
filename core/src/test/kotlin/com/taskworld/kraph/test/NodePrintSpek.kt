@@ -39,7 +39,7 @@ class NodePrintSpek : Spek({
             val fields = listOf(FieldNode("id"), FieldNode("title"))
             val node = SelectionSetNode(fields)
             it("should print {id title}") {
-                assertThat(node.print(), equalTo("{\r\nid\r\ntitle\r\n}"))
+                assertThat(node.print(), equalTo("{\\nid\\ntitle\\n}"))
             }
         }
         given("three fields; id, title, and assignee which contains name and email") {
@@ -48,7 +48,7 @@ class NodePrintSpek : Spek({
             val fields = listOf(FieldNode("id"), FieldNode("title"), assigneeField)
             val node = SelectionSetNode(fields)
             it("should print {id title assignee {name email}}") {
-                assertThat(node.print(), equalTo("{\r\nid\r\ntitle\r\nassignee {\r\nname\r\nemail\r\n}\r\n}"))
+                assertThat(node.print(), equalTo("{\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}"))
             }
         }
     }
@@ -58,7 +58,7 @@ class NodePrintSpek : Spek({
             val setNode = SelectionSetNode(listOf(FieldNode("id"), FieldNode("token")))
             val node = MutationNode("registerUser", argNode, setNode)
             it("should print registerUser(input: {email: \"abcd@efgh.com\", password: \"abcd1234\"}){ id token }") {
-                assertThat(node.print(), equalTo("registerUser(input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\r\nid\r\ntoken\r\n}"))
+                assertThat(node.print(), equalTo("registerUser(input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\\nid\\ntoken\\n}"))
             }
         }
     }
@@ -80,7 +80,7 @@ class NodePrintSpek : Spek({
             val setNode = SelectionSetNode(listOf(FieldNode("name"), FieldNode("email")))
             val node = FieldNode("assignee", selectionSet = setNode)
             it("should print assignee { name email }") {
-                assertThat(node.print(), equalTo("assignee {\r\nname\r\nemail\r\n}"))
+                assertThat(node.print(), equalTo("assignee {\\nname\\nemail\\n}"))
             }
         }
         given("name user and id argument with value as 10 and contains name and email") {
@@ -88,7 +88,7 @@ class NodePrintSpek : Spek({
             val setNode = SelectionSetNode(listOf(FieldNode("name"), FieldNode("email")))
             val node = FieldNode("user", argNode, setNode)
             it("should print user(id: 10){ name email }") {
-                assertThat(node.print(), equalTo("user(id: 10) {\r\nname\r\nemail\r\n}"))
+                assertThat(node.print(), equalTo("user(id: 10) {\\nname\\nemail\\n}"))
             }
         }
     }
@@ -96,20 +96,20 @@ class NodePrintSpek : Spek({
         given("query type and field named id") {
             val node = OperationNode(OperationType.QUERY, listOf(FieldNode("id")))
             it("should print query { id }") {
-                assertThat(node.print(), equalTo("query {\r\nid\r\n}"))
+                assertThat(node.print(), equalTo("query {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and field id") {
             val node = OperationNode(OperationType.QUERY, name = "getTask", fields = listOf(FieldNode("id")))
             it("should print query getTask { id }") {
-                assertThat(node.print(), equalTo("query getTask {\r\nid\r\n}"))
+                assertThat(node.print(), equalTo("query getTask {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and id(1234) as argument and field title") {
             val argNode = ArgumentNode(mapOf("id" to 1234))
             val node = OperationNode(OperationType.QUERY, name = "getTask", arguments = argNode, fields = listOf(FieldNode("title")))
             it("should print query getTask(id: 1234) { title }") {
-                assertThat(node.print(), equalTo("query getTask(id: 1234) {\r\ntitle\r\n}"))
+                assertThat(node.print(), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
             }
         }
     }
@@ -118,14 +118,14 @@ class NodePrintSpek : Spek({
             val queryNode = OperationNode(OperationType.QUERY, fields = listOf(FieldNode("id")))
             val node = DocumentNode(queryNode)
             it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
-                assertThat(node.print(), equalTo("{\"query\": \"query {\r\nid\r\n}\", \"variables\": null, \"operationName\": null}"))
+                assertThat(node.print(), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
             }
         }
         given("document with query named getAllTasks") {
             val queryNode = OperationNode(OperationType.QUERY, name = "getAllTasks", fields = listOf(FieldNode("id")))
             val node = DocumentNode(queryNode)
             it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
-                assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\r\nid\r\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
+                assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
             }
         }
     }

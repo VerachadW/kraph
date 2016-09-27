@@ -1,7 +1,5 @@
 package com.taskworld.kraph
 
-import com.sun.javadoc.FieldDoc
-
 /**
  * Created by VerachadW on 9/19/2016 AD.
  */
@@ -22,7 +20,7 @@ internal class DocumentNode(internal val operation: OperationNode) : Node {
 
 internal class SelectionSetNode(internal val fields: List<FieldNode>) : Node {
     override fun print(): String {
-        return "{\r\n${ fields.print() }}"
+        return "{\\n${ fields.print() }}"
     }
 }
 
@@ -32,7 +30,7 @@ internal class OperationNode(internal val type: OperationType, internal val fiel
     override fun print(): String {
         val namePart = name?.let { " " + it } ?: ""
         val argumentPart = arguments?.print() ?: ""
-        return "${type.name.toLowerCase()}$namePart$argumentPart {\r\n${ fields.print() }}"
+        return "${type.name.toLowerCase()}$namePart$argumentPart {\\n${ fields.print() }}"
     }
 }
 
@@ -63,7 +61,7 @@ internal class MutationArgumentNode(args: Map<String, Any>) : ArgumentNode(args)
 
 internal fun <T: Node> List<T>.print() =
     this.fold(""){ acc, node ->
-        acc + node.print() + "\r\n"
+        acc + node.print() + "\\n"
     }
 
 internal fun Map<String, Any>.print() =
