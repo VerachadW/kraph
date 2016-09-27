@@ -64,7 +64,7 @@ internal fun Map<String, Any>.print() =
             var string = acc + "${entry.key}: ${
             when (entry.value) {
                 is String -> {
-                    "\"" + entry.value + "\""
+                    "\\\"${entry.value}\\\""
                 }
                 else -> {
                     entry.value

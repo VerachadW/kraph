@@ -19,10 +19,10 @@ class NodePrintSpek : Spek({
                 assertThat(node.print(), equalTo("(id: 1)"))
             }
         }
-        given("id and title as arguments and value as 1 and \"Kraph\"") {
+        given("id and title as arguments and value as 1 and Kraph") {
             val node = ArgumentNode(mapOf("id" to 1, "title" to "Kraph"))
-            it("should print (id: 1, title: \"Kraph\")") {
-                assertThat(node.print(), equalTo("(id: 1, title: \"Kraph\")"))
+            it("should print (id: 1, title: \\\"Kraph\\\")") {
+                assertThat(node.print(), equalTo("(id: 1, title: \\\"Kraph\\\")"))
             }
         }
     }
@@ -31,6 +31,12 @@ class NodePrintSpek : Spek({
             val node = MutationArgumentNode(mapOf("id" to 1))
             it("should print (input: { id: 1 })") {
                 assertThat(node.print(), equalTo("(input: { id: 1 })"))
+            }
+        }
+        given("name as argument and value as John Doe") {
+            val node = MutationArgumentNode(mapOf("name" to "John Doe"))
+            it("should print (input: { name: \\\"John Doe\\\" })") {
+                assertThat(node.print(), equalTo("(input: { name: \\\"John Doe\\\" })"))
             }
         }
     }
@@ -57,8 +63,8 @@ class NodePrintSpek : Spek({
             val argNode = MutationArgumentNode(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
             val setNode = SelectionSetNode(listOf(FieldNode("id"), FieldNode("token")))
             val node = MutationNode("registerUser", argNode, setNode)
-            it("should print registerUser(input: {email: \"abcd@efgh.com\", password: \"abcd1234\"}){ id token }") {
-                assertThat(node.print(), equalTo("registerUser(input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\\nid\\ntoken\\n}"))
+            it("should print registerUser(input: {email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\"}){ id token }") {
+                assertThat(node.print(), equalTo("registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) {\\nid\\ntoken\\n}"))
             }
         }
     }
