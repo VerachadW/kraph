@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        publish_version = '0.1.0'
+        publish_version = '0.2.0'
 
         bintray_plugin_version = '0.3.4'
 
