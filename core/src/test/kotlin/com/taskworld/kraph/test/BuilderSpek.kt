@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.isA
 import com.taskworld.kraph.OperationType
-import com.taskworld.kraph.KraphQL
+import com.taskworld.kraph.Kraph
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
@@ -19,9 +19,9 @@ import org.junit.runner.RunWith
  */
 @RunWith(JUnitPlatform::class)
 class BuilderSpek : Spek({
-    describe("KraphQL Query DSL Builder") {
+    describe("Kraph Query DSL Builder") {
         given("smaple query") {
-            val query = KraphQL {
+            val query = Kraph {
                 query("getAllNotes") {
                     fieldObject("notes") {
                         field("id")
@@ -30,7 +30,7 @@ class BuilderSpek : Spek({
                             field("name")
                             field("email")
                         }
-                        field("avatarUrl", params = mapOf("size" to 100))
+                        field("avatarUrl", args = mapOf("size" to 100))
                     }
                 }
             }
@@ -72,7 +72,7 @@ class BuilderSpek : Spek({
             }
         }
         given("sample mutation") {
-            val query = KraphQL {
+            val query = Kraph {
                 mutation {
                     func("registerUser", mapOf("email" to "abcd@efgh.com", "password" to "abcd1234", "age" to 30)) {
                         field("id")

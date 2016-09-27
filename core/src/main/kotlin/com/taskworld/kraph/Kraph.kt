@@ -4,7 +4,7 @@ package com.taskworld.kraph
  * Created by VerachadW on 9/19/2016 AD.
  */
 
-class KraphQL(f: KraphQL.() -> Unit) {
+class Kraph(f: Kraph.() -> Unit) {
     internal lateinit var document: DocumentNode
 
     init {
@@ -36,20 +36,20 @@ class KraphQL(f: KraphQL.() -> Unit) {
         internal val fields = arrayListOf<FieldNode>()
         internal var selectionSet: SelectionSetNode? = null
 
-        fun fieldObject(name: String, params: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)) {
-            addField(name, params, builder)
+        fun fieldObject(name: String, args: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)) {
+            addField(name, args, builder)
         }
 
-        fun field(name: String, params: Map<String, Any>? = null) {
-            addField(name, params)
+        fun field(name: String, args: Map<String, Any>? = null) {
+            addField(name, args)
         }
 
-        private fun addField(name: String, params: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)? = null) {
-            val args = params?.let(::ArgumentNode)
+        private fun addField(name: String, args: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)? = null) {
+            val argNode = args?.let(::ArgumentNode)
             selectionSet = builder?.let {
                 selectionSet(builder)
             }
-            fields += FieldNode(name, arguments = args, selectionSet = selectionSet)
+            fields += FieldNode(name, arguments = argNode, selectionSet = selectionSet)
         }
 
     }
