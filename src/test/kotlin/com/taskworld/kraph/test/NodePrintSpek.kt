@@ -87,4 +87,20 @@ class NodePrintSpek : Spek({
             }
         }
     }
+    describe("DocumentNode print()") {
+        given("document with simple query") {
+            val queryNode = OperationNode(OperationType.QUERY, fields = listOf(FieldNode("id")))
+            val node = DocumentNode(queryNode)
+            it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
+                assertThat(node.print(), equalTo("{\"query\": \"query {\r\nid\r\n}\", \"variables\": null, \"operationName\": null}"))
+            }
+        }
+        given("document with query named getAllTasks") {
+            val queryNode = OperationNode(OperationType.QUERY, name = "getAllTasks", fields = listOf(FieldNode("id")))
+            val node = DocumentNode(queryNode)
+            it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
+                assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\r\nid\r\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
+            }
+        }
+    }
 })

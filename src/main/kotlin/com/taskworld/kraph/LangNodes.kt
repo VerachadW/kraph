@@ -10,7 +10,11 @@ interface Node {
 
 internal class DocumentNode(internal val operation: OperationNode) : Node {
     override fun print(): String {
-        return operation.print()
+        val operationNamePart = operation.name?.let {
+            "\"$it\""
+        }
+        val variablesPart = null
+        return "{\"query\": \"${operation.print()}\", \"variables\": $variablesPart, \"operationName\": $operationNamePart}"
     }
 }
 
@@ -21,10 +25,10 @@ internal class SelectionSetNode(internal val fields: List<FieldNode>) : Node {
 }
 
 internal class OperationNode(internal val type: OperationType, internal val fields: List<FieldNode>,
-                             internal val name: String = "", internal val arguments: ArgumentsNode? = null): Node {
+                             internal val name: String? = null, internal val arguments: ArgumentsNode? = null): Node {
 
     override fun print(): String {
-        val namePart = if (name.isNotBlank()) " " + name else ""
+        val namePart = name?.let { " " + it } ?: ""
         val argumentPart = arguments?.print() ?: ""
         return "${type.name.toLowerCase()}$namePart$argumentPart {\r\n${ fields.print() }}"
     }
