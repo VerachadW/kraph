@@ -2,11 +2,10 @@ package com.taskworld.kraph.test
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.isA
-import com.taskworld.kraph.OperationType
 import com.taskworld.kraph.Kraph
+import com.taskworld.kraph.OperationType
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
@@ -102,13 +101,13 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.fields[0].arguments!!.args["age"] as Int, equalTo(30))
             }
             it("should contains 2 field in registerUser payload") {
-                assertThat(query.document.operation.fields[0].selectionSet!!.fields , hasSize(equalTo(2)))
+                assertThat(query.document.operation.fields[0].selectionSet!!.fields, hasSize(equalTo(2)))
             }
             it("should have id field in registerUser payload") {
-                assertThat(query.document.operation.fields[0].selectionSet!!.fields[0].name , equalTo("id"))
+                assertThat(query.document.operation.fields[0].selectionSet!!.fields[0].name, equalTo("id"))
             }
             it("should have token field in mutation payload") {
-                assertThat(query.document.operation.fields[0].selectionSet!!.fields[1].name , equalTo("token"))
+                assertThat(query.document.operation.fields[0].selectionSet!!.fields[1].name, equalTo("token"))
             }
         }
     }

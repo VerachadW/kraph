@@ -4,7 +4,7 @@ import com.taskworld.kraph.Kraph
 fun main(args: Array<String>) {
     val url = "http://graphql-swapi.parseapp.com/?"
 
-    val query =  Kraph {
+    val query = Kraph {
         query {
             fieldObject("allFilms", mapOf("first" to 10)) {
                 fieldObject("films") {

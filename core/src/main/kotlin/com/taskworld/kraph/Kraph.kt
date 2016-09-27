@@ -11,7 +11,7 @@ class Kraph(f: Kraph.() -> Unit) {
         f.invoke(this)
     }
 
-    fun query(name: String? = null , builder: FieldBuilder.() -> Unit) {
+    fun query(name: String? = null, builder: FieldBuilder.() -> Unit) {
         document = DocumentNode(OperationNode(OperationType.QUERY, fields = FieldBuilder().apply(builder).fields, name = name))
     }
 
