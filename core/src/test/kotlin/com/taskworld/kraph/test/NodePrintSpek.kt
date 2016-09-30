@@ -26,15 +26,15 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("MutationArgumentNode print function") {
+    describe("InputArgumentNode print function") {
         given("id as argument and value as 1") {
-            val node = MutationArgumentNode(mapOf("id" to 1))
+            val node = InputArgumentNode(mapOf("id" to 1))
             it("should print (input: { id: 1 })") {
                 assertThat(node.print(), equalTo("(input: { id: 1 })"))
             }
         }
         given("name as argument and value as John Doe") {
-            val node = MutationArgumentNode(mapOf("name" to "John Doe"))
+            val node = InputArgumentNode(mapOf("name" to "John Doe"))
             it("should print (input: { name: \\\"John Doe\\\" })") {
                 assertThat(node.print(), equalTo("(input: { name: \\\"John Doe\\\" })"))
             }
@@ -60,7 +60,7 @@ class NodePrintSpek : Spek({
     }
     describe("MutationNode print function") {
         given("name registerUser with email and password as argument and payload contains id and token") {
-            val argNode = MutationArgumentNode(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
+            val argNode = InputArgumentNode(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
             val setNode = SelectionSetNode(listOf(FieldNode("id"), FieldNode("token")))
             val node = MutationNode("registerUser", argNode, setNode)
             it("should print registerUser(input: {email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\"}){ id token }") {

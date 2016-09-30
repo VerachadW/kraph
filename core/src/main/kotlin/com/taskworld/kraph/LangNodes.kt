@@ -39,6 +39,12 @@ internal open class ArgumentNode(internal val args: Map<String, Any> = mapOf()) 
     }
 }
 
+internal class InputArgumentNode(args: Map<String, Any>) : ArgumentNode(args) {
+    override fun print(): String {
+        return "(input: { ${args.print()} })"
+    }
+}
+
 internal open class FieldNode(internal val name: String, internal val arguments: ArgumentNode? = null, internal val selectionSet: SelectionSetNode? = null) : Node {
     override fun print(): String {
         val selectionSetPart = selectionSet?.let { " " + it.print() } ?: ""
@@ -46,13 +52,8 @@ internal open class FieldNode(internal val name: String, internal val arguments:
     }
 }
 
-internal class MutationNode(name: String, arguments: MutationArgumentNode, selectionSet: SelectionSetNode) : FieldNode(name, arguments, selectionSet)
+internal class MutationNode(name: String, arguments: InputArgumentNode, selectionSet: SelectionSetNode) : FieldNode(name, arguments, selectionSet)
 
-internal class MutationArgumentNode(args: Map<String, Any>) : ArgumentNode(args) {
-    override fun print(): String {
-        return "(input: { ${args.print()} })"
-    }
-}
 
 internal fun <T : Node> List<T>.print() =
         this.fold("") { acc, node ->

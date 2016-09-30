@@ -27,7 +27,7 @@ class Kraph(f: Kraph.() -> Unit) {
         internal val mutations = arrayListOf<MutationNode>()
 
         fun func(name: String, args: Map<String, Any>, builder: FieldBuilder.() -> Unit) {
-            mutations += MutationNode(name, MutationArgumentNode(args), selectionSet(builder))
+            mutations += MutationNode(name, InputArgumentNode(args), selectionSet(builder))
         }
 
     }
