@@ -19,6 +19,11 @@ class Kraph(f: Kraph.() -> Unit) {
         document = DocumentNode(OperationNode(OperationType.MUTATION, fields = MutationBuilder().apply(builder).mutations, name = name))
     }
 
+    private fun selectionSet(f: FieldBuilder.() -> Unit): SelectionSetNode {
+        val builder = FieldBuilder().apply(f)
+        return SelectionSetNode(builder.fields)
+    }
+
     override fun toString(): String {
         return document.print()
     }
@@ -51,12 +56,6 @@ class Kraph(f: Kraph.() -> Unit) {
             }
             fields += FieldNode(name, arguments = argNode, selectionSet = selectionSet)
         }
-
-    }
-
-    private fun selectionSet(f: FieldBuilder.() -> Unit): SelectionSetNode {
-        val builder = FieldBuilder().apply(f)
-        return SelectionSetNode(builder.fields)
     }
 
 }
