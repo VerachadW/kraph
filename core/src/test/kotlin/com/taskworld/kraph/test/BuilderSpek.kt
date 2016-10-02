@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.isA
 import com.taskworld.kraph.Kraph
-import com.taskworld.kraph.OperationType
+import com.taskworld.kraph.lang.OperationType
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given

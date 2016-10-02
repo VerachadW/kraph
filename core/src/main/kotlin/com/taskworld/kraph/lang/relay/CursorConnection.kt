@@ -1,5 +1,6 @@
 package com.taskworld.kraph.lang.relay
 
+import com.taskworld.kraph.lang.Argument
 import com.taskworld.kraph.lang.Field
 import com.taskworld.kraph.lang.SelectionSet
 
@@ -12,7 +13,7 @@ internal class CursorConnection : Field {
 
     constructor(name: String, first: Int = -1, last: Int = -1, after: String? = null, before: String? = null,
                 edges: Edges, pageInfo: PageInfo? = null) : super(name) {
-        val args = hashMapOf<String, Any>()
+        val args = linkedMapOf<String, Any>()
 
         if (first != -1) args.put("first", first)
         if (last != -1) args.put("last", last)
@@ -22,6 +23,8 @@ internal class CursorConnection : Field {
         if (args.isEmpty()) {
             throw IllegalArgumentException("There must be at least 1 argument for Cursor Connection")
         }
+
+        arguments = Argument(args)
 
         val fields = arrayListOf<Field>()
         fields.add(edges)

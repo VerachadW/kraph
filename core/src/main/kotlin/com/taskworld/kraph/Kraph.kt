@@ -62,9 +62,9 @@ class Kraph(f: Kraph.() -> Unit) {
     }
 
     inner class CursorConnectionBuilder() : FieldBuilder() {
-        fun cursor(name: String, first: Int = -1, last: Int = -1,
-                   before: String? = null, after: String? = null,
-                   builder: (CursorSelectionBuilder.() -> Unit)) {
+        fun connection(name: String, first: Int = -1, last: Int = -1,
+                       before: String? = null, after: String? = null,
+                       builder: (CursorSelectionBuilder.() -> Unit)) {
 
             val selection = CursorSelectionBuilder()
             builder.invoke(selection)
