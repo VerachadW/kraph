@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
 class NodePrintSpek : Spek({
-    describe("ArgumentNode print function") {
+    describe("Argument print function") {
         given("id as argument and value as 1") {
             val node = ArgumentNode(mapOf("id" to 1))
             it("should print (id: 1)") {
@@ -26,7 +26,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("InputArgumentNode print function") {
+    describe("InputArgument print function") {
         given("id as argument and value as 1") {
             val node = InputArgumentNode(mapOf("id" to 1))
             it("should print (input: { id: 1 })") {
@@ -40,7 +40,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("SelectionSetNode print function") {
+    describe("SelectionSet print function") {
         given("two fields; id and title") {
             val fields = listOf(FieldNode("id"), FieldNode("title"))
             val node = SelectionSetNode(fields)
@@ -58,7 +58,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("MutationNode print function") {
+    describe("Mutation print function") {
         given("name registerUser with email and password as argument and payload contains id and token") {
             val argNode = InputArgumentNode(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
             val setNode = SelectionSetNode(listOf(FieldNode("id"), FieldNode("token")))
@@ -68,7 +68,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("FieldNode print function") {
+    describe("Field print function") {
         given("name id") {
             val node = FieldNode("id")
             it("should print id") {
@@ -98,7 +98,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("OperationNode print function") {
+    describe("Operation print function") {
         given("query type and field named id") {
             val node = OperationNode(OperationType.QUERY, listOf(FieldNode("id")))
             it("should print query { id }") {
@@ -119,7 +119,7 @@ class NodePrintSpek : Spek({
             }
         }
     }
-    describe("DocumentNode print function") {
+    describe("Document print function") {
         given("document with simple query") {
             val queryNode = OperationNode(OperationType.QUERY, fields = listOf(FieldNode("id")))
             val node = DocumentNode(queryNode)
