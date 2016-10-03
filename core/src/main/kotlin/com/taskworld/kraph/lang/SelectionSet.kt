@@ -5,6 +5,7 @@ package com.taskworld.kraph.lang
  */
 
 internal class SelectionSet(internal val fields: List<Field>) : GraphPrintable {
+
     override fun print(): String {
         return "{\\n${fields.print()}}"
     }

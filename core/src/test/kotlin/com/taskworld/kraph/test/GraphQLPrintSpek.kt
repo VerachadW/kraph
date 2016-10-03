@@ -3,8 +3,6 @@ package com.taskworld.kraph.test
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.taskworld.kraph.lang.*
-import com.taskworld.kraph.lang.relay.CursorConnection
-import com.taskworld.kraph.lang.relay.Edges
 import com.taskworld.kraph.lang.relay.InputArgument
 import com.taskworld.kraph.lang.relay.Mutation
 import org.jetbrains.spek.api.Spek
@@ -16,6 +14,7 @@ import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
 class GraphQLPrintSpek : Spek({
+
     describe("Argument print function") {
         given("id as argument and value as 1") {
             val node = Argument(mapOf("id" to 1))
@@ -102,53 +101,22 @@ class GraphQLPrintSpek : Spek({
             }
         }
     }
-    describe("Relay Connection print function") {
-        given("connection named notes with title in node object and only 10 items") {
-            val edgesNode = Edges(SelectionSet(listOf(Field("title"))))
-            val node = CursorConnection("notes", first = 10, edges = edgesNode)
-            it("should print notes(first: 10) { edges { node { title } cursor } }") {
-                assertThat(node.print(), equalTo("notes(first: 10) {\\nedges {\\nnode {\\ntitle\\n}\\ncursor\\n}\\n}"))
-            }
-        }
-        given("connection named notes with title in node object and only next 10 items after cursor named 'abcd1234'") {
-            val edgesNode = Edges(SelectionSet(listOf(Field("title"))))
-            val node = CursorConnection("notes", first = 10, after= "abcd1234", edges = edgesNode)
-            it("should print notes(first: 10, before: \"abcd1234\") { edges { node { title } cursor } }") {
-                assertThat(node.print(), equalTo("notes(first: 10, after: \\\"abcd1234\\\") {\\nedges {\\nnode {\\ntitle\\n}\\ncursor\\n}\\n}"))
-            }
-        }
-        given("connection named notes with title in node object and only last 10 items") {
-            val edgesNode = Edges(SelectionSet(listOf(Field("title"))))
-            val node = CursorConnection("notes", last = 10, edges = edgesNode)
-            it("should print notes(last: 10) { edges { node { title } cursor } }") {
-                assertThat(node.print(), equalTo("notes(last: 10) {\\nedges {\\nnode {\\ntitle\\n}\\ncursor\\n}\\n}"))
-            }
-        }
-        given("connection named notes with title in node object and only last 10 items before cursor named 'abcd1234'") {
-            val edgesNode = Edges(SelectionSet(listOf(Field("title"))))
-            val node = CursorConnection("notes", last = 10, before = "abcd1234", edges = edgesNode)
-            it("should print notes(last: 10, before: \"abcd1234\") { edges { node { title } cursor } }") {
-                assertThat(node.print(), equalTo("notes(last: 10, before: \\\"abcd1234\\\") {\\nedges {\\nnode {\\ntitle\\n}\\ncursor\\n}\\n}"))
-            }
-        }
-    }
-
     describe("Operation print function") {
         given("query type and field named id") {
-            val node = Operation(OperationType.QUERY, listOf(Field("id")))
+            val node = Operation(OperationType.QUERY, SelectionSet(listOf(Field("id"))))
             it("should print query { id }") {
                 assertThat(node.print(), equalTo("query {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and field id") {
-            val node = Operation(OperationType.QUERY, name = "getTask", fields = listOf(Field("id")))
+            val node = Operation(OperationType.QUERY, name = "getTask", selectionSet = SelectionSet(listOf(Field("id"))))
             it("should print query getTask { id }") {
                 assertThat(node.print(), equalTo("query getTask {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and id(1234) as argument and field title") {
             val argNode = Argument(mapOf("id" to 1234))
-            val node = Operation(OperationType.QUERY, name = "getTask", arguments = argNode, fields = listOf(Field("title")))
+            val node = Operation(OperationType.QUERY, name = "getTask", arguments = argNode, selectionSet= SelectionSet(listOf(Field("title"))))
             it("should print query getTask(id: 1234) { title }") {
                 assertThat(node.print(), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
             }
@@ -156,14 +124,14 @@ class GraphQLPrintSpek : Spek({
     }
     describe("Document print function") {
         given("document with simple query") {
-            val queryNode = Operation(OperationType.QUERY, fields = listOf(Field("id")))
+            val queryNode = Operation(OperationType.QUERY, selectionSet = SelectionSet(listOf(Field("id"))))
             val node = Document(queryNode)
             it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
                 assertThat(node.print(), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
             }
         }
         given("document with query named getAllTasks") {
-            val queryNode = Operation(OperationType.QUERY, name = "getAllTasks", fields = listOf(Field("id")))
+            val queryNode = Operation(OperationType.QUERY, name = "getAllTasks", selectionSet = SelectionSet(listOf(Field("id"))))
             val node = Document(queryNode)
             it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
                 assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))

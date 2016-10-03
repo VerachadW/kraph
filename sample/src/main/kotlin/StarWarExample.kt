@@ -6,9 +6,11 @@ fun main(args: Array<String>) {
 
     val query = Kraph {
         query {
-            fieldObject("allFilms", mapOf("first" to 10)) {
-                fieldObject("films") {
-                    field("title")
+            connection("allFilms", first = 10) {
+                edges {
+                    node {
+                        field("title")
+                    }
                 }
             }
         }
