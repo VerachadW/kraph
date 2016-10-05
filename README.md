@@ -35,7 +35,7 @@ As you can see, we can achieve our goal with just a few tweaks from the original
 
 ### Features
 - DSL builder style. Make it easier to read and use.
-- Support both Query and Mutation operation.
+- Support CursorConnection field and Input object for mutation in Relay.
 
 ### Set up
 Adding Kraph to `build.gradle`
@@ -49,8 +49,56 @@ Adding Kraph to `build.gradle`
     }
 ```
 
-### Usage
-Please see the example from `sample` folder for now. We will update this part ASAP.
+### Guide
+If you are not familiar with GraphQL syntax, We recommended to read on this [specification](https://facebook.github.io/graphql/) to have an overview of how to write Graphql. Usually, you should be able to use the query from other tools(e.g. [GraphiQL](https://github.com/graphql/graphiql)) with a few tweaks. First, let's see what Kraph provided for you.
 
+- `query` represents QUERY operation in GraphQL. It can be named by passing String as a parameter. The `query` block can only contains `field` or `fieldObject`.
+```
+    /*
+    * query GetUsers {
+    *   ...
+    * }
+    */
+    Kraph {
+        query("GetUsers") {
+            ...
+        }
+    }
+```
+- `field` and `fieldObject` represents FIELD in SELECTION SET. The different is that `fieldObject` allow you to have it owns SELECTION SET, which represent data object in GraphQL. Both of them have a parameter named `args` for arguments in paritcular field.
+```
+    /*
+    * query {
+    *   users {
+    *       name
+    *       email
+    *       avatarUrl(size: 100)
+    *   }
+    * }
+    */
+    Kraph {
+        query {
+            fieldObject("users") {
+                field("name")
+                field("email")
+                field("avatarUrl", args = mapOf("size" to 100))
+            }
+        }
+    }
+```
+- `mutation` represents MUTATION operation in GraphQL. The `mutation` block can have only contains `func`.
+```
+    /*
+    * mutation updateUserProfile {
+    *   ...
+    * }
+    */
+    Kraph {
+        mutation("UpdateUserProfile") {
+            ... 
+        }
+    }
+```
+- `func` represents as FIELD inside MUTATION block. The reason we did not used `fieldObject`
 ### Contributing to Kraph
 We use Github issues for tracking bugs and requests. Any feedback and/or PRs is welcome.
