@@ -2,7 +2,9 @@ package com.taskworld.kraph.test
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.taskworld.kraph.*
+import com.taskworld.kraph.lang.*
+import com.taskworld.kraph.lang.relay.InputArgument
+import com.taskworld.kraph.lang.relay.Mutation
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
@@ -11,125 +13,126 @@ import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
-class NodePrintSpek : Spek({
-    describe("ArgumentNode print function") {
+class GraphQLPrintSpek : Spek({
+
+    describe("Argument print function") {
         given("id as argument and value as 1") {
-            val node = ArgumentNode(mapOf("id" to 1))
+            val node = Argument(mapOf("id" to 1))
             it("should print (id: 1)") {
                 assertThat(node.print(), equalTo("(id: 1)"))
             }
         }
         given("id and title as arguments and value as 1 and Kraph") {
-            val node = ArgumentNode(mapOf("id" to 1, "title" to "Kraph"))
+            val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
             it("should print (id: 1, title: \\\"Kraph\\\")") {
                 assertThat(node.print(), equalTo("(id: 1, title: \\\"Kraph\\\")"))
             }
         }
     }
-    describe("MutationArgumentNode print function") {
+    describe("InputArgument print function") {
         given("id as argument and value as 1") {
-            val node = MutationArgumentNode(mapOf("id" to 1))
+            val node = InputArgument(mapOf("id" to 1))
             it("should print (input: { id: 1 })") {
                 assertThat(node.print(), equalTo("(input: { id: 1 })"))
             }
         }
         given("name as argument and value as John Doe") {
-            val node = MutationArgumentNode(mapOf("name" to "John Doe"))
+            val node = InputArgument(mapOf("name" to "John Doe"))
             it("should print (input: { name: \\\"John Doe\\\" })") {
                 assertThat(node.print(), equalTo("(input: { name: \\\"John Doe\\\" })"))
             }
         }
     }
-    describe("SelectionSetNode print function") {
+    describe("SelectionSet print function") {
         given("two fields; id and title") {
-            val fields = listOf(FieldNode("id"), FieldNode("title"))
-            val node = SelectionSetNode(fields)
+            val fields = listOf(Field("id"), Field("title"))
+            val node = SelectionSet(fields)
             it("should print {id title}") {
                 assertThat(node.print(), equalTo("{\\nid\\ntitle\\n}"))
             }
         }
         given("three fields; id, title, and assignee which contains name and email") {
-            val assigneeSet = SelectionSetNode(listOf(FieldNode("name"), FieldNode("email")))
-            val assigneeField = FieldNode("assignee", selectionSet = assigneeSet)
-            val fields = listOf(FieldNode("id"), FieldNode("title"), assigneeField)
-            val node = SelectionSetNode(fields)
+            val assigneeSet = SelectionSet(listOf(Field("name"), Field("email")))
+            val assigneeField = Field("assignee", selectionSet = assigneeSet)
+            val fields = listOf(Field("id"), Field("title"), assigneeField)
+            val node = SelectionSet(fields)
             it("should print {id title assignee {name email}}") {
                 assertThat(node.print(), equalTo("{\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}"))
             }
         }
     }
-    describe("MutationNode print function") {
+    describe("Mutation print function") {
         given("name registerUser with email and password as argument and payload contains id and token") {
-            val argNode = MutationArgumentNode(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
-            val setNode = SelectionSetNode(listOf(FieldNode("id"), FieldNode("token")))
-            val node = MutationNode("registerUser", argNode, setNode)
+            val argNode = InputArgument(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
+            val setNode = SelectionSet(listOf(Field("id"), Field("token")))
+            val node = Mutation("registerUser", argNode, setNode)
             it("should print registerUser(input: {email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\"}){ id token }") {
                 assertThat(node.print(), equalTo("registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) {\\nid\\ntoken\\n}"))
             }
         }
     }
-    describe("FieldNode print function") {
+    describe("Field print function") {
         given("name id") {
-            val node = FieldNode("id")
+            val node = Field("id")
             it("should print id") {
                 assertThat(node.print(), equalTo("id"))
             }
         }
         given("name avatarSize and size argument with value as 20") {
-            val argNode = ArgumentNode(mapOf("size" to 20))
-            val node = FieldNode("avatarSize", arguments = argNode)
+            val argNode = Argument(mapOf("size" to 20))
+            val node = Field("avatarSize", arguments = argNode)
             it("should print avatarSize(size: 20)") {
                 assertThat(node.print(), equalTo("avatarSize(size: 20)"))
             }
         }
         given("name assignee that contains name and email") {
-            val setNode = SelectionSetNode(listOf(FieldNode("name"), FieldNode("email")))
-            val node = FieldNode("assignee", selectionSet = setNode)
+            val setNode = SelectionSet(listOf(Field("name"), Field("email")))
+            val node = Field("assignee", selectionSet = setNode)
             it("should print assignee { name email }") {
                 assertThat(node.print(), equalTo("assignee {\\nname\\nemail\\n}"))
             }
         }
         given("name user and id argument with value as 10 and contains name and email") {
-            val argNode = ArgumentNode(mapOf("id" to 10))
-            val setNode = SelectionSetNode(listOf(FieldNode("name"), FieldNode("email")))
-            val node = FieldNode("user", argNode, setNode)
+            val argNode = Argument(mapOf("id" to 10))
+            val setNode = SelectionSet(listOf(Field("name"), Field("email")))
+            val node = Field("user", argNode, setNode)
             it("should print user(id: 10){ name email }") {
                 assertThat(node.print(), equalTo("user(id: 10) {\\nname\\nemail\\n}"))
             }
         }
     }
-    describe("OperationNode print function") {
+    describe("Operation print function") {
         given("query type and field named id") {
-            val node = OperationNode(OperationType.QUERY, listOf(FieldNode("id")))
+            val node = Operation(OperationType.QUERY, SelectionSet(listOf(Field("id"))))
             it("should print query { id }") {
                 assertThat(node.print(), equalTo("query {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and field id") {
-            val node = OperationNode(OperationType.QUERY, name = "getTask", fields = listOf(FieldNode("id")))
+            val node = Operation(OperationType.QUERY, name = "getTask", selectionSet = SelectionSet(listOf(Field("id"))))
             it("should print query getTask { id }") {
                 assertThat(node.print(), equalTo("query getTask {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and id(1234) as argument and field title") {
-            val argNode = ArgumentNode(mapOf("id" to 1234))
-            val node = OperationNode(OperationType.QUERY, name = "getTask", arguments = argNode, fields = listOf(FieldNode("title")))
+            val argNode = Argument(mapOf("id" to 1234))
+            val node = Operation(OperationType.QUERY, name = "getTask", arguments = argNode, selectionSet= SelectionSet(listOf(Field("title"))))
             it("should print query getTask(id: 1234) { title }") {
                 assertThat(node.print(), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
             }
         }
     }
-    describe("DocumentNode print function") {
+    describe("Document print function") {
         given("document with simple query") {
-            val queryNode = OperationNode(OperationType.QUERY, fields = listOf(FieldNode("id")))
-            val node = DocumentNode(queryNode)
+            val queryNode = Operation(OperationType.QUERY, selectionSet = SelectionSet(listOf(Field("id"))))
+            val node = Document(queryNode)
             it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
                 assertThat(node.print(), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
             }
         }
         given("document with query named getAllTasks") {
-            val queryNode = OperationNode(OperationType.QUERY, name = "getAllTasks", fields = listOf(FieldNode("id")))
-            val node = DocumentNode(queryNode)
+            val queryNode = Operation(OperationType.QUERY, name = "getAllTasks", selectionSet = SelectionSet(listOf(Field("id"))))
+            val node = Document(queryNode)
             it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
                 assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
             }
