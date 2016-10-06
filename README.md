@@ -51,8 +51,8 @@ Adding Kraph to `build.gradle`
 
 ### Guide
 If you are not familiar with GraphQL syntax, We recommended to read on this [specification](https://facebook.github.io/graphql/) to have an overview of how to write Graphql. Usually, you should be able to use the query from other tools(e.g. [GraphiQL](https://github.com/graphql/graphiql)) with a few tweaks. First, let's see what Kraph provided for you.
-
-- `query` represents QUERY operation in GraphQL. It can be named by passing String as a parameter. The `query` block can only contains `field` or `fieldObject`.
+#### Simple GraphQL
+- `query`/`mutation` represents QUERY and MUTATION operation in GraphQL. It can be named by passing String as a parameter. 
 ```
     /*
     * query GetUsers {
@@ -62,6 +62,17 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
     Kraph {
         query("GetUsers") {
             ...
+        }
+    }
+    
+    /*
+    * mutation updateUserProfile {
+    *   ...
+    * }
+    */
+    Kraph {
+        mutation("UpdateUserProfile") {
+            ... 
         }
     }
 ```
@@ -86,19 +97,57 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
         }
     }
 ```
-- `mutation` represents MUTATION operation in GraphQL. The `mutation` block can have only contains `func`.
+#### Relay
+- `func` represents as FIELD inside MUTATION block that follow [Relay Input Object Mutations](https://facebook.github.io/relay/graphql/mutations.htm) specification.
 ```
     /*
-    * mutation updateUserProfile {
-    *   ...
+    * mutation {
+    *   userLogin(input: {email: "hello@taskworld.com", password: "abcd1234"}) {
+    *       accessToken
+    *       user {
+    *           id
+    *           email
+    *       }
+    *   }
     * }
     */
+    
     Kraph {
-        mutation("UpdateUserProfile") {
-            ... 
+        mutation {
+            func("userLogin", input = mapOf("email" to "hello@taskworld.com", "password" to "abcd1234")) {
+                field("accessToken")
+                fieldObject("") {
+                    field("id")
+                    field("email")
+                }
+            }
         }
     }
 ```
-- `func` represents as FIELD inside MUTATION block. The reason we did not used `fieldObject`
+- `cursorConnection` represents as FIELD that follow [Relay Cursor Connections](https://facebook.github.io/relay/graphql/connections.htm) specification
+```
+    /*
+    * query {
+    *   users(first: 10, after: "user::1234") {
+    *       edges {
+    *           node {
+    *               id
+    *               name
+    *           }
+    *       }
+    *   }
+    * }
+    */
+    Kraph {
+        cursorConnection("users", first = 10, after = "user::1234") {   
+            edges {
+                node {
+                    field("id")
+                    field("name")
+                }
+            }
+        }
+    }
+```
 ### Contributing to Kraph
 We use Github issues for tracking bugs and requests. Any feedback and/or PRs is welcome.

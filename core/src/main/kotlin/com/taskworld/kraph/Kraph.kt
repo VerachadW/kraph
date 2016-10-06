@@ -49,9 +49,9 @@ class Kraph(f: Kraph.() -> Unit) {
             addField(name, args)
         }
 
-        fun connection(name: String, first: Int = -1, last: Int = -1,
-                       before: String? = null, after: String? = null,
-                       builder: (CursorSelectionBuilder.() -> Unit)) {
+        fun cursorConnection(name: String, first: Int = -1, last: Int = -1,
+                             before: String? = null, after: String? = null,
+                             builder: (CursorSelectionBuilder.() -> Unit)) {
             val argsMap = linkedMapOf<String, Any>()
             if (first != -1) argsMap.put("first", first)
             if (last != -1) argsMap.put("last", last)

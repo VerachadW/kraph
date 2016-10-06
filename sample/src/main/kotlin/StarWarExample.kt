@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
 
     val query = Kraph {
         query {
-            connection("allFilms", first = 10) {
+            cursorConnection("allFilms", first = 10) {
                 edges {
                     node {
                         field("title")

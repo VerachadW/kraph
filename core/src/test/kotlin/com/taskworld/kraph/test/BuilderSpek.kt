@@ -141,10 +141,10 @@ class BuilderSpek : Spek({
                 }, throws(noFieldInSelectionSetMessageMatcher("mutation")))
             }
         }
-        given("sample query with cursor connection first 10 items after cursor a1") {
+        given("sample query with cursor cursorConnection first 10 items after cursor a1") {
             val query = Kraph {
                 query {
-                    connection("users", first = 10, after = "a1") {
+                    cursorConnection("users", first = 10, after = "a1") {
                         edges {
                             node {
                                 field("id")
@@ -154,23 +154,23 @@ class BuilderSpek : Spek({
                     }
                 }
             }
-            it("should have cursor connection field") {
+            it("should have cursor cursorConnection field") {
                 assertThat(query.document.operation.selectionSet.fields[0] is CursorConnection, equalTo(true))
             }
-            it("should have argument first with value 10 for cursor connection") {
+            it("should have argument first with value 10 for cursor cursorConnection") {
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["first"] as Int, equalTo(10))
             }
-            it("should have argument after with value a1 for cursor connection") {
+            it("should have argument after with value a1 for cursor cursorConnection") {
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["after"] as String, equalTo("a1"))
             }
             it("should have custom field inside edges block") {
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[0].selectionSet!!.fields[1].name, equalTo("custom"))
             }
         }
-        given("sample query with cursor connection last 10 items before cursor a2 and PageInfo object") {
+        given("sample query with cursor cursorConnection last 10 items before cursor a2 and PageInfo object") {
             val query = Kraph {
                 query {
-                    connection("users", last = 10, before = "a2") {
+                    cursorConnection("users", last = 10, before = "a2") {
                         edges {
                             node {
                                 field("id")
@@ -183,13 +183,13 @@ class BuilderSpek : Spek({
                     }
                 }
             }
-            it("should have cursor connection field") {
+            it("should have cursor cursorConnection field") {
                 assertThat(query.document.operation.selectionSet.fields[0] is CursorConnection, equalTo(true))
             }
-            it("should have argument first with value 10 for cursor connection") {
+            it("should have argument first with value 10 for cursor cursorConnection") {
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["last"] as Int, equalTo(10))
             }
-            it("should have argument after with value a1 for cursor connection") {
+            it("should have argument after with value a1 for cursor cursorConnection") {
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["before"] as String, equalTo("a2"))
             }
             it("should have custom field next to edges block") {
@@ -202,12 +202,12 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[1].selectionSet!!.fields[0].name, equalTo("hasNextPage"))
             }
         }
-        given("sample query with cursor connection without arguments") {
+        given("sample query with cursor cursorConnection without arguments") {
             it("should throw IllegalArgumentException with message \"There must be at least 1 argument for Cursor Connection\"") {
                 assertThat({
                 Kraph {
                     query {
-                        connection("users") {
+                        cursorConnection("users") {
                             edges {
                                 node {
                                     field("title")
@@ -224,7 +224,7 @@ class BuilderSpek : Spek({
                 assertThat({
                     Kraph {
                         query {
-                            connection("users", first = 10) {
+                            cursorConnection("users", first = 10) {
                                 edges {
                                     node {
                                         field("title")

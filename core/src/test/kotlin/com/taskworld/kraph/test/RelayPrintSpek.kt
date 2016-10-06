@@ -43,7 +43,7 @@ class RelayPrintSpek : Spek({
         }
     }
     describe("Relay Cursor Connection print function") {
-        given("cursor connection named notes with title in node object and only 10 items") {
+        given("cursor cursorConnection named notes with title in node object and only 10 items") {
             val selectionSet = SelectionSet(listOf(Edges(SelectionSet(listOf(Field("title"))))))
             val argsNode = Argument(mapOf("first" to 10))
             val node = CursorConnection("notes", argsNode, selectionSet)
@@ -51,7 +51,7 @@ class RelayPrintSpek : Spek({
                 assertThat(node.print(), equalTo("notes(first: 10) {\\nedges {\\nnode {\\ntitle\\n}\\n}\\n}"))
             }
         }
-        given("cursor connection named notes with title in node object and only next 10 items after cursor named 'abcd1234'") {
+        given("cursor cursorConnection named notes with title in node object and only next 10 items after cursor named 'abcd1234'") {
             val selectionSet = SelectionSet(listOf(Edges(SelectionSet(listOf(Field("title"))))))
             val argsNode = Argument(mapOf("first" to 10, "after" to "abcd1234"))
             val node = CursorConnection("notes", argsNode, selectionSet)
@@ -59,7 +59,7 @@ class RelayPrintSpek : Spek({
                 assertThat(node.print(), equalTo("notes(first: 10, after: \\\"abcd1234\\\") {\\nedges {\\nnode {\\ntitle\\n}\\n}\\n}"))
             }
         }
-        given("cursor connection named notes with title in node object and only last 10 items") {
+        given("cursor cursorConnection named notes with title in node object and only last 10 items") {
             val selectionSet = SelectionSet(listOf(Edges(SelectionSet(listOf(Field("title"))))))
             val argsNode = Argument(mapOf("last" to 10))
             val node = CursorConnection("notes", argsNode, selectionSet)
@@ -67,7 +67,7 @@ class RelayPrintSpek : Spek({
                 assertThat(node.print(), equalTo("notes(last: 10) {\\nedges {\\nnode {\\ntitle\\n}\\n}\\n}"))
             }
         }
-        given("cursor connection named notes with title in node object and only last 10 items before cursor named 'abcd1234'") {
+        given("cursor cursorConnection named notes with title in node object and only last 10 items before cursor named 'abcd1234'") {
             val selectionSet = SelectionSet(listOf(Edges(SelectionSet(listOf(Field("title"))))))
             val argsNode = Argument(mapOf("last" to 10, "before" to "abcd1234"))
             val node = CursorConnection("notes", argsNode, selectionSet)
@@ -75,7 +75,7 @@ class RelayPrintSpek : Spek({
                 assertThat(node.print(), equalTo("notes(last: 10, before: \\\"abcd1234\\\") {\\nedges {\\nnode {\\ntitle\\n}\\n}\\n}"))
             }
         }
-        given("cursor connection named notes with PageInfo object") {
+        given("cursor cursorConnection named notes with PageInfo object") {
             val pageNode = PageInfo(SelectionSet(listOf(Field("hasNextPage"), Field("hasPreviousPage"))))
             val selectionSet = SelectionSet(listOf(Edges(SelectionSet(listOf(Field("title")))), pageNode))
             val argsNode = Argument(mapOf("first" to 10))
