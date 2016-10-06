@@ -20,8 +20,8 @@ class Kraph(f: Kraph.() -> Unit) {
         document = Document(Operation(OperationType.QUERY, selectionSet = set, name = name))
     }
 
-    fun mutation(name: String? = null, builder: MutationBuilder.() -> Unit) {
-        val set = createMutationSet("mutation", builder)
+    fun mutation(name: String? = null, builder: FieldBuilder.() -> Unit) {
+        val set = createSelectionSet("mutation", builder)
         document = Document(Operation(OperationType.MUTATION, selectionSet = set, name = name))
     }
 
@@ -34,26 +34,8 @@ class Kraph(f: Kraph.() -> Unit) {
         return set
     }
 
-    private fun createMutationSet(name: String, f: MutationBuilder.() -> Unit): SelectionSet {
-        val builder = MutationBuilder().apply(f)
-        val set = SelectionSet(builder.mutations)
-        if (set.fields.isEmpty()) {
-            throw NoFieldsInSelectionSetException("No field elements inside \"$name\" block")
-        }
-        return set
-    }
-
     override fun toString(): String {
         return document.print()
-    }
-
-    inner class MutationBuilder() {
-        internal val mutations = arrayListOf<Mutation>()
-
-        fun func(name: String, args: Map<String, Any>, builder: FieldBuilder.() -> Unit) {
-            mutations += Mutation(name, InputArgument(args), createSelectionSet(name, builder))
-        }
-
     }
 
     inner open class FieldBuilder() {
@@ -70,9 +52,7 @@ class Kraph(f: Kraph.() -> Unit) {
         fun connection(name: String, first: Int = -1, last: Int = -1,
                        before: String? = null, after: String? = null,
                        builder: (CursorSelectionBuilder.() -> Unit)) {
-
             val argsMap = linkedMapOf<String, Any>()
-
             if (first != -1) argsMap.put("first", first)
             if (last != -1) argsMap.put("last", last)
             before?.let { argsMap.put("before", it) }
@@ -86,7 +66,10 @@ class Kraph(f: Kraph.() -> Unit) {
             builder.invoke(selection)
 
             fields += CursorConnection(name, Argument(argsMap), SelectionSet(selection.fields))
+        }
 
+        fun func(name: String, args: Map<String, Any>, builder: FieldBuilder.() -> Unit) {
+            fields += Mutation(name, InputArgument(args), createSelectionSet(name, builder))
         }
 
         protected fun addField(name: String, args: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)? = null) {
@@ -96,7 +79,6 @@ class Kraph(f: Kraph.() -> Unit) {
             }
             fields += Field(name, arguments = argNode, selectionSet = selectionSet)
         }
-
     }
 
     inner class CursorSelectionBuilder() : FieldBuilder() {
