@@ -3,7 +3,7 @@ import com.taskworld.kraph.Kraph
 fun main(args: Array<String>) {
 
     // Sample query
-    println(Kraph {
+    val query = Kraph {
         query {
             fieldObject("notes") {
                 field("id")
@@ -15,10 +15,13 @@ fun main(args: Array<String>) {
                 }
             }
         }
-    })
+    }
+
+    println("Query: ${query.toGraphQueryString()}")
+    println("Request Body: ${ query.toRequestString() }")
 
     // Sample mutation
-    println(Kraph {
+    val mutation = Kraph {
         mutation {
             func("updateNote", args = mapOf("id" to 123, "title" to "Hello Kraph")) {
                 field("id")
@@ -26,6 +29,10 @@ fun main(args: Array<String>) {
                 field("updatedDate")
             }
         }
-    })
+    }
+
+    println("Query: ${mutation.toGraphQueryString()}")
+    println("Request Body: ${ mutation.toRequestString() }")
+
 
 }

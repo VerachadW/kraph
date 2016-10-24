@@ -119,7 +119,7 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
         mutation {
             func("userLogin", input = mapOf("email" to "hello@taskworld.com", "password" to "abcd1234")) {
                 field("accessToken")
-                fieldObject("") {
+                fieldObject("user") {
                     field("id")
                     field("email")
                 }
@@ -152,6 +152,40 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
             }
         }
     }
+```
+#### Request/Query String
+- `toRequestString()` is used for generating request JSON body for POST method.
+- `toGraphQueryString()` will give you the formatted GraphQuery string. This is very useful for debugging.
+```kotlin
+    val query = Kraph {
+        query {
+            fieldObject("users") {
+                field("name")
+                field("email")
+                field("avatarUrl", args = mapOf("size" to 100))
+            }
+        }
+    }    
+    
+    println(query.toRequestString())
+    /*
+    * Result: {"query": "query {\nnotes {\nid\ncreatedDate\ncontent\nauthor {\nname\navatarUrl(size: 100)\n}\n}\n}", "variables": null, "operationName": null}
+    */
+    println(query.toGrapQueryString())
+    /*
+    * Result: 
+    * query {
+    *   notes {
+    *     id
+    *     createdDate
+    *     content
+    *     author {
+    *       name
+    *       avatarUrl(size: 100)
+    *     }
+    *   }
+    * }
+    */
 ```
 ### Contributing to Kraph
 We use Github issues for tracking bugs and requests. Any feedback and/or PRs is welcome.
