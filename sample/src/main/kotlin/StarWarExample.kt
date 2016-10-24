@@ -16,9 +16,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    println(query)
-
-    url.httpPost().header("content-type" to "application/json", "Accept" to "application/json").body(query.toString()).responseString { request, response, result ->
+    url.httpPost().header("content-type" to "application/json", "Accept" to "application/json").body(query.toRequestString()).responseString { request, response, result ->
         println(response)
     }
 }

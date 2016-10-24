@@ -19,27 +19,19 @@ class GraphQLPrintSpek : Spek({
         given("id as argument and value as 1") {
             val node = Argument(mapOf("id" to 1))
             it("should print (id: 1)") {
-                assertThat(node.print(), equalTo("(id: 1)"))
+                assertThat(node.print(false, 0), equalTo("(id: 1)"))
             }
         }
         given("id and title as arguments and value as 1 and Kraph") {
             val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
             it("should print (id: 1, title: \\\"Kraph\\\")") {
-                assertThat(node.print(), equalTo("(id: 1, title: \\\"Kraph\\\")"))
+                assertThat(node.print(false, 0), equalTo("(id: 1, title: \\\"Kraph\\\")"))
             }
         }
-    }
-    describe("InputArgument print function") {
-        given("id as argument and value as 1") {
-            val node = InputArgument(mapOf("id" to 1))
-            it("should print (input: { id: 1 })") {
-                assertThat(node.print(), equalTo("(input: { id: 1 })"))
-            }
-        }
-        given("name as argument and value as John Doe") {
-            val node = InputArgument(mapOf("name" to "John Doe"))
-            it("should print (input: { name: \\\"John Doe\\\" })") {
-                assertThat(node.print(), equalTo("(input: { name: \\\"John Doe\\\" })"))
+        given("id and title as arguments and value as 1 and Kraph with pretty format enabled") {
+            val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
+            it("should print (id: 1, title: \"Kraph\")") {
+                assertThat(node.print(true, 0), equalTo("(id: 1, title: \"Kraph\")"))
             }
         }
     }
@@ -48,7 +40,7 @@ class GraphQLPrintSpek : Spek({
             val fields = listOf(Field("id"), Field("title"))
             val node = SelectionSet(fields)
             it("should print {id title}") {
-                assertThat(node.print(), equalTo("{\\nid\\ntitle\\n}"))
+                assertThat(node.print(false, 0), equalTo("{\\nid\\ntitle\\n}"))
             }
         }
         given("three fields; id, title, and assignee which contains name and email") {
@@ -57,7 +49,16 @@ class GraphQLPrintSpek : Spek({
             val fields = listOf(Field("id"), Field("title"), assigneeField)
             val node = SelectionSet(fields)
             it("should print {id title assignee {name email}}") {
-                assertThat(node.print(), equalTo("{\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}"))
+                assertThat(node.print(false, 0), equalTo("{\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}"))
+            }
+        }
+        given("three fields; id, title, and assignee which contains name and email with pretty format enabled") {
+            val assigneeSet = SelectionSet(listOf(Field("name"), Field("email")))
+            val assigneeField = Field("assignee", selectionSet = assigneeSet)
+            val fields = listOf(Field("id"), Field("title"), assigneeField)
+            val node = SelectionSet(fields)
+            it("should print {id title assignee {name email}} with pretty format") {
+                assertThat(node.print(true, 0), equalTo("{\n  id\n  title\n  assignee {\n    name\n    email\n  }\n}"))
             }
         }
     }
@@ -67,7 +68,7 @@ class GraphQLPrintSpek : Spek({
             val setNode = SelectionSet(listOf(Field("id"), Field("token")))
             val node = Mutation("registerUser", argNode, setNode)
             it("should print registerUser(input: {email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\"}){ id token }") {
-                assertThat(node.print(), equalTo("registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) {\\nid\\ntoken\\n}"))
+                assertThat(node.print(false, 0), equalTo("registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) {\\nid\\ntoken\\n}"))
             }
         }
     }
@@ -75,21 +76,21 @@ class GraphQLPrintSpek : Spek({
         given("name id") {
             val node = Field("id")
             it("should print id") {
-                assertThat(node.print(), equalTo("id"))
+                assertThat(node.print(false, 0), equalTo("id"))
             }
         }
         given("name avatarSize and size argument with value as 20") {
             val argNode = Argument(mapOf("size" to 20))
             val node = Field("avatarSize", arguments = argNode)
             it("should print avatarSize(size: 20)") {
-                assertThat(node.print(), equalTo("avatarSize(size: 20)"))
+                assertThat(node.print(false, 0), equalTo("avatarSize(size: 20)"))
             }
         }
         given("name assignee that contains name and email") {
             val setNode = SelectionSet(listOf(Field("name"), Field("email")))
             val node = Field("assignee", selectionSet = setNode)
             it("should print assignee { name email }") {
-                assertThat(node.print(), equalTo("assignee {\\nname\\nemail\\n}"))
+                assertThat(node.print(false, 0), equalTo("assignee {\\nname\\nemail\\n}"))
             }
         }
         given("name user and id argument with value as 10 and contains name and email") {
@@ -97,7 +98,7 @@ class GraphQLPrintSpek : Spek({
             val setNode = SelectionSet(listOf(Field("name"), Field("email")))
             val node = Field("user", argNode, setNode)
             it("should print user(id: 10){ name email }") {
-                assertThat(node.print(), equalTo("user(id: 10) {\\nname\\nemail\\n}"))
+                assertThat(node.print(false, 0), equalTo("user(id: 10) {\\nname\\nemail\\n}"))
             }
         }
     }
@@ -105,20 +106,20 @@ class GraphQLPrintSpek : Spek({
         given("query type and field named id") {
             val node = Operation(OperationType.QUERY, SelectionSet(listOf(Field("id"))))
             it("should print query { id }") {
-                assertThat(node.print(), equalTo("query {\\nid\\n}"))
+                assertThat(node.print(false, 0), equalTo("query {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and field id") {
             val node = Operation(OperationType.QUERY, name = "getTask", selectionSet = SelectionSet(listOf(Field("id"))))
             it("should print query getTask { id }") {
-                assertThat(node.print(), equalTo("query getTask {\\nid\\n}"))
+                assertThat(node.print(false, 0), equalTo("query getTask {\\nid\\n}"))
             }
         }
         given("query type with name \"getTask\" and id(1234) as argument and field title") {
             val argNode = Argument(mapOf("id" to 1234))
             val node = Operation(OperationType.QUERY, name = "getTask", arguments = argNode, selectionSet= SelectionSet(listOf(Field("title"))))
             it("should print query getTask(id: 1234) { title }") {
-                assertThat(node.print(), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
+                assertThat(node.print(false, 0), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
             }
         }
     }
@@ -127,14 +128,14 @@ class GraphQLPrintSpek : Spek({
             val queryNode = Operation(OperationType.QUERY, selectionSet = SelectionSet(listOf(Field("id"))))
             val node = Document(queryNode)
             it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
-                assertThat(node.print(), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
+                assertThat(node.print(false, 0), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
             }
         }
         given("document with query named getAllTasks") {
             val queryNode = Operation(OperationType.QUERY, name = "getAllTasks", selectionSet = SelectionSet(listOf(Field("id"))))
             val node = Document(queryNode)
             it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
-                assertThat(node.print(), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
+                assertThat(node.print(false, 0), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
             }
         }
     }
