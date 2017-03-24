@@ -1,13 +1,13 @@
 buildscript {
     ext {
-        publish_version = '0.4.0'
+        publish_version = '0.4.1'
 
         bintray_plugin_version = '0.3.4'
 
-        spek_version = '1.0.89'
+        spek_version = '1.1.0-beta4'
         hamkrest_version = '1.2.2.0'
         junit_version = '4.12'
-        junit_platform_version = '1.0.0-M2'
+        junit_platform_version = '1.0.0-M3'
 
     }
     repositories {
@@ -17,13 +17,22 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.junit.platform:junit-platform-gradle-plugin:$junit_platform_version"
-        classpath "org.junit.platform:junit-platform-runner:$junit_platform_version"
+//        classpath "org.junit.platform:junit-platform-runner:$junit_platform_version"
         classpath "com.novoda:bintray-release:$bintray_plugin_version"
     }
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+junitPlatform {
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
+}
 
 archivesBaseName = 'kraph'
 version = "v.$publish_version"
@@ -31,6 +40,7 @@ version = "v.$publish_version"
 repositories {
     jcenter()
     mavenCentral()
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
 }
 
 sourceSets {
@@ -51,9 +61,15 @@ publish {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
-    testCompile "org.jetbrains.spek:spek-api:$spek_version"
-    testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spek_version"
-    testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version"
+    testCompile ("org.jetbrains.spek:spek-api:$spek_version") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    testRuntime ("org.jetbrains.spek:spek-junit-platform-engine:$spek_version") {
+        exclude group: 'org.junit.platform'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+//    testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version"
 }

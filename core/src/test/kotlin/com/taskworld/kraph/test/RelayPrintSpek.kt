@@ -13,13 +13,10 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
-import org.junit.platform.runner.JUnitPlatform
-import org.junit.runner.RunWith
 
 /**
  * Created by VerachadW on 10/3/2016 AD.
  */
-@RunWith(JUnitPlatform::class)
 class RelayPrintSpek : Spek({
     describe("Relay InputArgument print function") {
         given("id as argument and value as 1") {
