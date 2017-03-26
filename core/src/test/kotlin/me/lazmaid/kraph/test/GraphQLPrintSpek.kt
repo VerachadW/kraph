@@ -1,10 +1,10 @@
-package com.taskworld.kraph.test
+package me.lazmaid.kraph.test
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.taskworld.kraph.lang.*
-import com.taskworld.kraph.lang.relay.InputArgument
-import com.taskworld.kraph.lang.relay.Mutation
+import me.lazmaid.kraph.lang.relay.InputArgument
+import me.lazmaid.kraph.lang.relay.Mutation
+import me.lazmaid.kraph.lang.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given

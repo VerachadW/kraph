@@ -1,11 +1,15 @@
-package com.taskworld.kraph
+package me.lazmaid.kraph
 
-import com.taskworld.kraph.lang.*
-import com.taskworld.kraph.lang.relay.*
+import me.lazmaid.kraph.lang.*
+import me.lazmaid.kraph.lang.relay.*
 
 /**
  * Created by VerachadW on 9/19/2016 AD.
  */
+
+typealias FieldBlock = Kraph.FieldBuilder.() -> Unit
+typealias CursorBlock = Kraph.CursorSelectionBuilder.() -> Unit
+typealias NodeBlock = Kraph.NodeBuilder.() -> Unit
 
 class Kraph(f: Kraph.() -> Unit) {
 
@@ -15,17 +19,17 @@ class Kraph(f: Kraph.() -> Unit) {
         f.invoke(this)
     }
 
-    fun query(name: String? = null, builder: FieldBuilder.() -> Unit) {
+    fun query(name: String? = null, builder: FieldBlock) {
         val set = createSelectionSet("query", builder)
         document = Document(Operation(OperationType.QUERY, selectionSet = set, name = name))
     }
 
-    fun mutation(name: String? = null, builder: FieldBuilder.() -> Unit) {
+    fun mutation(name: String? = null, builder: FieldBlock) {
         val set = createSelectionSet("mutation", builder)
         document = Document(Operation(OperationType.MUTATION, selectionSet = set, name = name))
     }
 
-    private fun createSelectionSet(name: String, f: FieldBuilder.() -> Unit): SelectionSet {
+    private fun createSelectionSet(name: String, f: FieldBlock): SelectionSet {
         val builder = FieldBuilder().apply(f)
         val set = SelectionSet(builder.fields)
         if (set.fields.isEmpty()) {
@@ -37,10 +41,10 @@ class Kraph(f: Kraph.() -> Unit) {
     fun toGraphQueryString() = document.operation.print(true, 0)
     fun toRequestString() = document.print(false, 0)
 
-    inner open class FieldBuilder() {
+    inner open class FieldBuilder {
         internal val fields = arrayListOf<Field>()
 
-        fun fieldObject(name: String, args: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)) {
+        fun fieldObject(name: String, args: Map<String, Any>? = null, builder: FieldBlock) {
             addField(name, args, builder)
         }
 
@@ -50,7 +54,7 @@ class Kraph(f: Kraph.() -> Unit) {
 
         fun cursorConnection(name: String, first: Int = -1, last: Int = -1,
                              before: String? = null, after: String? = null,
-                             builder: (CursorSelectionBuilder.() -> Unit)) {
+                             builder: CursorBlock) {
             val argsMap = linkedMapOf<String, Any>()
             if (first != -1) argsMap.put("first", first)
             if (last != -1) argsMap.put("last", last)
@@ -67,11 +71,11 @@ class Kraph(f: Kraph.() -> Unit) {
             fields += CursorConnection(name, Argument(argsMap), SelectionSet(selection.fields))
         }
 
-        fun func(name: String, args: Map<String, Any>, builder: FieldBuilder.() -> Unit) {
+        fun func(name: String, args: Map<String, Any>, builder: FieldBlock) {
             fields += Mutation(name, InputArgument(args), createSelectionSet(name, builder))
         }
 
-        protected fun addField(name: String, args: Map<String, Any>? = null, builder: (FieldBuilder.() -> Unit)? = null) {
+        protected fun addField(name: String, args: Map<String, Any>? = null, builder: FieldBlock? = null) {
             val argNode = args?.let(::Argument)
             val selectionSet = builder?.let {
                 createSelectionSet(name, builder)
@@ -80,9 +84,9 @@ class Kraph(f: Kraph.() -> Unit) {
         }
     }
 
-    inner class CursorSelectionBuilder() : FieldBuilder() {
+    inner class CursorSelectionBuilder : FieldBuilder() {
 
-        fun edges(builder: NodeBuilder.() -> Unit) {
+        fun edges(builder: NodeBlock) {
             val node = NodeBuilder()
             builder.invoke(node)
             fields += Edges(node.selectionSet, node.fields)
@@ -97,7 +101,7 @@ class Kraph(f: Kraph.() -> Unit) {
         }
     }
 
-    inner class NodeBuilder(): FieldBuilder() {
+    inner class NodeBuilder: FieldBuilder() {
         internal lateinit var selectionSet: SelectionSet
         fun node(builder: FieldBuilder.() -> Unit) {
             selectionSet = createSelectionSet("node", builder)

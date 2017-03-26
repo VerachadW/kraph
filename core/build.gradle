@@ -1,10 +1,10 @@
 buildscript {
     ext {
-        publish_version = '0.4.1'
+        publish_version = '0.5.0'
 
         bintray_plugin_version = '0.3.4'
 
-        spek_version = '1.1.0-beta4'
+        spek_version = '1.1.0'
         hamkrest_version = '1.2.2.0'
         junit_version = '4.12'
         junit_platform_version = '1.0.0-M3'
@@ -17,7 +17,6 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.junit.platform:junit-platform-gradle-plugin:$junit_platform_version"
-//        classpath "org.junit.platform:junit-platform-runner:$junit_platform_version"
         classpath "com.novoda:bintray-release:$bintray_plugin_version"
     }
 }
@@ -48,15 +47,15 @@ sourceSets {
 }
 
 publish {
-    userOrg = 'tw'
-    groupId = 'com.taskworld.kraph'
+    userOrg = 'verachadw'
+    groupId = 'me.lazmaid.kraph'
     artifactId = 'kraph'
     bintrayUser = "$System.env.BINTRAY_USER"
     bintrayKey = "$System.env.BINTRAY_API_KEY"
     publishVersion = "$publish_version"
     licences = ['MIT']
     desc = 'GraphQL query builder written in Kotlin'
-    website = 'https://github.com/taskworld/kraph'
+    website = 'https://github.com/VerachadW/kraph'
 }
 
 dependencies {
@@ -71,5 +70,4 @@ dependencies {
         exclude group: 'org.junit.platform'
         exclude group: 'org.jetbrains.kotlin'
     }
-//    testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version"
 }

@@ -1,5 +1,5 @@
 import com.github.kittinunf.fuel.httpPost
-import com.taskworld.kraph.Kraph
+import me.lazmaid.kraph.Kraph
 
 fun main(args: Array<String>) {
     val url = "http://graphql-swapi.parseapp.com/?"

@@ -1,8 +1,8 @@
-package com.taskworld.kraph.lang.relay
+package me.lazmaid.kraph.lang.relay
 
-import com.taskworld.kraph.lang.Argument
-import com.taskworld.kraph.lang.Field
-import com.taskworld.kraph.lang.SelectionSet
+import me.lazmaid.kraph.lang.Argument
+import me.lazmaid.kraph.lang.Field
+import me.lazmaid.kraph.lang.SelectionSet
 
 
 /**

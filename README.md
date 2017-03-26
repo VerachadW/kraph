@@ -45,7 +45,7 @@ Adding Kraph to `build.gradle`
     }
     
     dependencies {
-        compile "com.taskworld.kraph:kraph:x.y.z"
+        compile "me.lazmaid.kraph:kraph:x.y.z"
     }
 ```
 

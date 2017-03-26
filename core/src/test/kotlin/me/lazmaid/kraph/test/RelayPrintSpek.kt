@@ -1,14 +1,14 @@
-package com.taskworld.kraph.test
+package me.lazmaid.kraph.test
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.taskworld.kraph.lang.Argument
-import com.taskworld.kraph.lang.Field
-import com.taskworld.kraph.lang.SelectionSet
-import com.taskworld.kraph.lang.relay.CursorConnection
-import com.taskworld.kraph.lang.relay.Edges
-import com.taskworld.kraph.lang.relay.InputArgument
-import com.taskworld.kraph.lang.relay.PageInfo
+import me.lazmaid.kraph.lang.Argument
+import me.lazmaid.kraph.lang.Field
+import me.lazmaid.kraph.lang.SelectionSet
+import me.lazmaid.kraph.lang.relay.CursorConnection
+import me.lazmaid.kraph.lang.relay.Edges
+import me.lazmaid.kraph.lang.relay.InputArgument
+import me.lazmaid.kraph.lang.relay.PageInfo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given

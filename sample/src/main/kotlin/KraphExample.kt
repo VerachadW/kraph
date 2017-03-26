@@ -1,4 +1,4 @@
-import com.taskworld.kraph.Kraph
+import me.lazmaid.kraph.Kraph
 
 fun main(args: Array<String>) {
 
