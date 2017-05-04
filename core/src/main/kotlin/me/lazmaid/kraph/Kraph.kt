@@ -11,31 +11,12 @@ typealias FieldBlock = Kraph.FieldBuilder.() -> Unit
 typealias CursorBlock = Kraph.CursorSelectionBuilder.() -> Unit
 typealias NodeBlock = Kraph.NodeBuilder.() -> Unit
 
-class Kraph(f: Kraph.() -> Unit) {
+class Kraph(init: Kraph.() -> Unit) {
 
     internal lateinit var document: Document
 
     init {
-        f.invoke(this)
-    }
-
-    fun query(name: String? = null, builder: FieldBlock) {
-        val set = createSelectionSet("query", builder)
-        document = Document(Operation(OperationType.QUERY, selectionSet = set, name = name))
-    }
-
-    fun mutation(name: String? = null, builder: FieldBlock) {
-        val set = createSelectionSet("mutation", builder)
-        document = Document(Operation(OperationType.MUTATION, selectionSet = set, name = name))
-    }
-
-    private fun createSelectionSet(name: String, f: FieldBlock): SelectionSet {
-        val builder = FieldBuilder().apply(f)
-        val set = SelectionSet(builder.fields)
-        if (set.fields.isEmpty()) {
-            throw NoFieldsInSelectionSetException("No field elements inside \"$name\" block")
-        }
-        return set
+        init()
     }
 
     fun toGraphQueryString() = document.operation.print(true, 0)
