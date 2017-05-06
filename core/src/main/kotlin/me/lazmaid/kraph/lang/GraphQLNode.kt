@@ -1,10 +1,6 @@
 package me.lazmaid.kraph.lang
 
-/**
- * Created by VerachadW on 10/2/2016 AD.
- */
-
-abstract internal class GraphQLNode {
+abstract class GraphQLNode {
     var level = 0
 
     abstract fun print(prettyFormat: Boolean, previousLevel: Int): String
