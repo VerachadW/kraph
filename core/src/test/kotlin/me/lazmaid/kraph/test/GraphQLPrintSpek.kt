@@ -27,6 +27,19 @@ class GraphQLPrintSpek : Spek({
                 }
             }
         }
+        given("money as argument and value as 123.45") {
+            val node = Argument(mapOf("money" to 123.45))
+            on("print pretty") {
+                it("should print (money: 123.45)") {
+                    assertThat(node.print(true, 0), equalTo("(money: 123.45)"))
+                }
+            }
+            on("print normal") {
+                it("should print (money: 123.45)") {
+                    assertThat(node.print(false, 0), equalTo("(money: 123.45)"))
+                }
+            }
+        }
         given("id and title as arguments and value as 1 and Kraph") {
             val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
             on("print pretty") {
@@ -50,6 +63,35 @@ class GraphQLPrintSpek : Spek({
             on("print normal") {
                 it("should print (titles: [\\\"title1\\\", \\\"title2\\\"]") {
                     assertThat(node.print(false, 0), equalTo("(titles: [\\\"title1\\\", \\\"title2\\\"])"))
+                }
+            }
+        }
+        given("an user object as argument") {
+            val user = mapOf("name" to "John Doe", "email" to "john.doe@test.com")
+            val node = Argument(mapOf("user" to user))
+            on("print pretty") {
+                it("should print (user: {\"name\": \"John Doe\", \"email\": \"john.doe@test.com\"})") {
+                    assertThat(node.print(true, 0), equalTo("(user: {\"name\": \"John Doe\", \"email\": \"john.doe@test.com\"})"))
+                }
+            }
+            on("print normal") {
+                it("should print (user: {\\\"name\\\": \\\"John Doe\\\", \\\"email\\\": \\\"john.doe@test.com\\\"})") {
+                    assertThat(node.print(false, 0), equalTo("(user: {\\\"name\\\": \\\"John Doe\\\", \\\"email\\\": \\\"john.doe@test.com\\\"})"))
+                }
+            }
+        }
+        given("an array of user object as argument") {
+            val user1 = mapOf("name" to "user1", "email" to "user1@test.com")
+            val user2 = mapOf("name" to "user2", "email" to "user2@test.com")
+            val node = Argument(mapOf("users" to listOf(user1, user2)))
+            on("print pretty") {
+                it("should print (users: [{\"name\": \"user1\", \"email\": \"user1@test.com\"}, {\"name\": \"user2\", \"email\": \"user2@test.com\"}])") {
+                    assertThat(node.print(true, 0), equalTo("(users: [{\"name\": \"user1\", \"email\": \"user1@test.com\"}, {\"name\": \"user2\", \"email\": \"user2@test.com\"}])"))
+                }
+            }
+            on("print pretty") {
+                it("should print (users: [{\\\"name\\\": \\\"user1\\\", \\\"email\\\": \\\"user1@test.com\\\"}, {\\\"name\": \\\"user2\\\", \\\"email\\\": \\\"user2@test.com\\\"}])") {
+                    assertThat(node.print(false, 0), equalTo("(users: [{\\\"name\\\": \\\"user1\\\", \\\"email\": \\\"user1@test.com\\\"}, {\\\"name\\\": \\\"user2\\\", \\\"email\\\": \\\"user2@test.com\\\"}])"))
                 }
             }
         }
