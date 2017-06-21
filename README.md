@@ -1,4 +1,4 @@
-# Kraph [![Build Status](https://travis-ci.org/VerachadW/kraph.svg?branch=master)](https://travis-ci.org/VerachadW/kraph) [ ![Download](https://api.bintray.com/packages/tw/maven/kraph/images/download.svg) ](https://bintray.com/tw/maven/kraph/_latestVersion)
+# Kraph [![Build Status](https://travis-ci.org/VerachadW/kraph.svg?branch=master)](https://travis-ci.org/VerachadW/kraph) [ ![Download](https://api.bintray.com/packages/tw/maven/kraph/images/download.svg) ](https://bintray.com/tw/maven/kraph/_latestVersion) [![codecov](https://codecov.io/gh/VerachadW/kraph/branch/master/graph/badge.svg)](https://codecov.io/gh/VerachadW/kraph)
 In short, this is a GraphQL request JSON body builder for Kotlin. It will generate the JSON string for request body that work with GraphQL Server. For example, we have the GraphQL query for list all the notes.
 ```
     query {

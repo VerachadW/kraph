@@ -8,6 +8,12 @@ env:
   global:
   - secure: VLdggtNem5VHnUyGPfyrA05wnpmOqAlMbfd6fyNTh0/YpYzwnJ/2kqEcnCdcJn/GsDyubGcEvl7+PXzI4LmCS1fedQgj/9h+/nAFYEx6UInrczXEAKf3d53DH+rSCgTzvilqFBvLl6fJhkCv+/YuvDkOhWvBWN6QqZjBLCNc60Qw4kXsExU8TfG09wnu37TJuo78zmmY51Y85YDtsgnvw0C7mLk7n4R7yBiPEFi2ZAYehVdaN2eyUdl6uQsNm3rTdXMLRo0rQDsUOe7hFJYJz8F1ASMQmsY5xDGRfUpIBG78pV4IpMCTzoxpH3IaaK7Misxj3H5lgDzXEvtPf5t8SpKYfTBz1Pmc2ogVifV9YayRWl2K6bHabundAJQcYzhrBXZMPebpu5Pdi1GompOXdyhLx053x7+3/qhNK+81Tw71vNNt8+vRDNE9bIV00M1TE1YfHFz/GzBgUuPmigAl+CIY14w+PGJABFG7UHVDkjABMkOJHhFtLLwkkwx73CoPr8PzaXR9WzduPAwjiOpu0P69e5S4C5ZM3XxfBma8hW5K5RFvnw1FYSkE9+FEjhgdUX9bpfiHIhRS/3scTzscPhwuy804nmJqJbADjNtYVklVk6QaondMlEBu530uC57OHwRaLWLSDbPCWQwy2PsoBxtHewcld2x6IBGrPFj+qz0=
 
+script:
+  - ./gradlew check jacocTestReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 deploy:
 - provider: script
   skip_cleanup: true
