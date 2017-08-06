@@ -40,6 +40,19 @@ class GraphQLPrintSpek : Spek({
                 }
             }
         }
+        given("isCancel as argument and value as false") {
+            val node = Argument(mapOf("isCancel" to false))
+            on("print pretty") {
+                it("should print (isCancel: false)") {
+                    assertThat(node.print(true, 0), equalTo("(isCancel: false)"))
+                }
+            }
+            on("print normal") {
+                it("should print (isCancel: false)") {
+                    assertThat(node.print(false, 0), equalTo("(isCancel: false)"))
+                }
+            }
+        }
         given("id and title as arguments and value as 1 and Kraph") {
             val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
             on("print pretty") {
