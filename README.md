@@ -171,7 +171,7 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
     /*
     * Result: {"query": "query {\nnotes {\nid\ncreatedDate\ncontent\nauthor {\nname\navatarUrl(size: 100)\n}\n}\n}", "variables": null, "operationName": null}
     */
-    println(query.toGrapQueryString())
+    println(query.toGraphQueryString())
     /*
     * Result: 
     * query {
