@@ -1,7 +1,5 @@
 package me.lazmaid.kraph.lang
 
-import javax.xml.crypto.Data
-
 /**
  * Created by vwongsawangt on 8/6/2017 AD.
  */
@@ -9,19 +7,21 @@ import javax.xml.crypto.Data
 internal sealed class DataEntry {
     abstract fun print(prettyFormat: Boolean): String
 
-    class NonDecimalNumberData(val value: Long) : DataEntry() {
+    class NonDecimalNumberData(private val value: Long) : DataEntry() {
+        constructor(value: Int) : this(value.toLong())
+
         override fun print(prettyFormat: Boolean) = value.toString()
     }
 
-    class DecimalNumberData(val value: Double) : DataEntry() {
+    class DecimalNumberData(private val value: Double) : DataEntry() {
         override fun print(prettyFormat: Boolean) = value.toString()
     }
 
-    class BooleanData(val value: Boolean) : DataEntry() {
+    class BooleanData(private val value: Boolean) : DataEntry() {
         override fun print(prettyFormat: Boolean) = value.toString()
     }
 
-    class StringData(val value: String) : DataEntry() {
+    class StringData(private val value: String) : DataEntry() {
         override fun print(prettyFormat: Boolean) =
                 if (prettyFormat) {
                     "\"$value\""
@@ -30,7 +30,7 @@ internal sealed class DataEntry {
                 }
     }
 
-    class ArrayData(val values: List<DataEntry>) : DataEntry() {
+    class ArrayData(private val values: List<DataEntry>) : DataEntry() {
         override fun print(prettyFormat: Boolean) =
                 values.foldIndexed("[") { index, acc, item ->
                     var newAcc = acc + item.print(prettyFormat)
@@ -43,7 +43,7 @@ internal sealed class DataEntry {
                 }
     }
 
-    class ObjectData(val values: List<Pair<String, DataEntry>>) : DataEntry() {
+    class ObjectData(private val values: List<Pair<String, DataEntry>>) : DataEntry() {
         override fun print(prettyFormat: Boolean) =
                 values.foldIndexed("{") { index, acc, (k, v) ->
                     var newAcc = acc + "${k.wrappedWithQuotes(prettyFormat)}: ${v.print(prettyFormat)}"

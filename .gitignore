@@ -4,4 +4,5 @@
 .gradle
 
 build
+out
 gradle.properties
