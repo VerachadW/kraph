@@ -1,95 +1,116 @@
 # Kraph [![Build Status](https://travis-ci.org/VerachadW/kraph.svg?branch=master)](https://travis-ci.org/VerachadW/kraph) [ ![Download](https://api.bintray.com/packages/verachadw/maven/kraph/images/download.svg) ](https://bintray.com/tw/maven/kraph/_latestVersion) [![codecov](https://codecov.io/gh/VerachadW/kraph/branch/master/graph/badge.svg)](https://codecov.io/gh/VerachadW/kraph)
-In short, this is a GraphQL request JSON body builder for Kotlin. It will generate the JSON string for request body that work with GraphQL Server. For example, we have the GraphQL query for list all the notes.
-```
-    query {
-        notes {
-            id
-            createdDate
-            content
-            author {
-                name
-                avatarUrl(size: 100)
-            }
+
+In short, this is a GraphQL request JSON body builder for Kotlin. It will
+generate the JSON string for request body that work with GraphQL Server.
+For example, we have this GraphQL query to list all notes:
+```graphql
+query {
+    notes {
+        id
+        createdDate
+        content
+        author {
+            name
+            avatarUrl(size: 100)
         }
     }
+}
 ```
-And here is how we write it in Kotlin using Kraph.
+
+Which is written in Kotlin using Kraph like this:
 ```kotlin
-    Kraph {
-        query {
-            fieldObject("notes") {
-                field("id")
-                field("createdDate")
-                field("content")
-                fieldObject("author") {
-                    field("name")
-                    field("avatarUrl", mapOf("size" to 100))
-                }
+Kraph {
+    query {
+        fieldObject("notes") {
+            field("id")
+            field("createdDate")
+            field("content")
+            fieldObject("author") {
+                field("name")
+                field("avatarUrl", mapOf("size" to 100))
             }
         }
     }
+}
 ```
 As you can see, we can achieve our goal with just a few tweaks from the original query.
 
 **NOTE:** Kraph is still in an early stage. The usage may change in further development.
 
 ### Features
-- DSL builder style. Make it easier to read and use.
-- Support Cursor Connection and Input object Mutation in Relay.
+
+-   DSL builder style. Make it easier to read and use.
+-   Support Cursor Connection and Input Object Mutation in Relay.
 
 ### Set up
+
 Adding Kraph to `build.gradle`
-```kotlin
-    repositories {
-        jcenter()
-    }
-    
-    dependencies {
-        compile "me.lazmaid.kraph:kraph:x.y.z"
-    }
+```gradle
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "me.lazmaid.kraph:kraph:x.y.z"
+}
 ```
 
 ### Guide
-If you are not familiar with GraphQL syntax, We recommended to read on this [specification](https://facebook.github.io/graphql/) to have an overview of how to write Graphql. Usually, you should be able to use the query from other tools(e.g. [GraphiQL](https://github.com/graphql/graphiql)) with a few tweaks. First, let's see what Kraph provided for you.
+
+If you are not familiar with GraphQL syntax, it is recommended to read the
+[GraphQL introduction](http://graphql.org/learn/) for an overview of how Graphql
+works. Usually, you should be able to use queries from other tools (e.g.
+[GraphiQL](https://github.com/graphql/graphiql)) with a few tweaks.
+First, let's see what Kraph provides for you.
+
 #### Simple GraphQL
-- `query`/`mutation` represents QUERY and MUTATION operation in GraphQL. It can be named by passing String as a parameter. 
-```kotlin
-    /*
-    * query GetUsers {
-    *   ...
-    * }
-    */
-    
+
+-   `query` and `mutation` represents the Query and Mutation operations of GraphQL.
+    The name of the query or mutaton can be passed as a string.
+
+    GraphQL:
+    ```graphql
+    query GetUsers {
+      ...
+    }
+    ```
+    Kraph:
+    ```kotlin
     Kraph {
         query("GetUsers") {
             ...
         }
     }
-    
-    /*
-    * mutation updateUserProfile {
-    *   ...
-    * }
-    */
-    
+    ```
+    GraphQL:
+    ```graphql
+    mutation UpdateUserProfile {
+      ...
+    }
+    ```
+    Kraph:
+    ```kotlin
     Kraph {
         mutation("UpdateUserProfile") {
-            ... 
+            ...
         }
     }
-```
-- `field` and `fieldObject` represents FIELD in SELECTION SET. The different is that `fieldObject` allow you to have it owns SELECTION SET, which represent data object in GraphQL. Both of them have a parameter named `args` for arguments in paritcular field.
-```kotlin
-    /*
-    * query {
-    *   users {
-    *       name
-    *       email
-    *       avatarUrl(size: 100)
-    *   }
-    * }
-    */
-    
+    ```
+-   `field` and `fieldObject` represent accessors for fields. Though there are
+    technically no differences, `fieldObject` may be chosen for clarity to indicate
+    that a field must contain another set of nested fields as an argument.
+    Both of them take a `Map<String, Any>` that maps Kotlin data types to the
+    GraphQL data types for input objects.
+    ```graphql
+    query {
+      users {
+        name
+        email
+        avatarUrl(size: 100)
+      }
+    }
+    ```
+    ```kotlin
     Kraph {
         query {
             fieldObject("users") {
@@ -99,22 +120,60 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
             }
         }
     }
-```
+    ```
+
+-   `fragment` provides a mechanism for creating GraphQL Fragments. To use a fragment
+    in a query requires two steps. The first is to define the fragment, letting
+    Kraph know how to handle it later:
+    ```graphql
+    fragment UserFragment on User {
+      name
+      email
+      avatarUrl(size: 100)
+    }
+    ```
+    ```kotlin
+    Kraph.defineFragment("UserFragment") {
+        field("name")
+        field("email")
+        field("avatarUrl", mapOf("size" to 100))
+    }
+    ```
+    Then, when you are creating your query, you can simply use the fragment and
+    its fields will be expanded:
+    ```graphql
+    query {
+      users {
+        ...UserFragment
+      }
+    }
+    ```
+    ```kotlin
+    Kraph {
+        query("GetUsers") {
+            fieldObject("users") {
+                fragment("UserFragment")
+            }
+        }
+    }
+    ```
+
 #### Relay
-- `func` represents as FIELD inside MUTATION block that follow [Relay Input Object Mutations](https://facebook.github.io/relay/graphql/mutations.htm) specification.
-```kotlin
-    /*
-    * mutation {
-    *   userLogin(input: {email: "hello@taskworld.com", password: "abcd1234"}) {
-    *       accessToken
-    *       user {
-    *           id
-    *           email
-    *       }
-    *   }
-    * }
-    */
-    
+
+-   `func` represents a Field inside a Mutation block that follows the
+    [Relay Input Object Mutations](https://facebook.github.io/relay/graphql/mutations.htm) specification.
+    ```graphql
+    mutation {
+      userLogin(input: {email: "hello@taskworld.com", password: "abcd1234"}) {
+        accessToken
+        user {
+          id
+          email
+        }
+      }
+    }
+    ```
+    ```kotlin
     Kraph {
         mutation {
             func("userLogin", input = mapOf("email" to "hello@taskworld.com", "password" to "abcd1234")) {
@@ -126,22 +185,22 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
             }
         }
     }
-```
-- `cursorConnection` represents as FIELD that follow [Relay Cursor Connections](https://facebook.github.io/relay/graphql/connections.htm) specification
-```kotlin
-    /*
-    * query {
-    *   users(first: 10, after: "user::1234") {
-    *       edges {
-    *           node {
-    *               id
-    *               name
-    *           }
-    *       }
-    *   }
-    * }
-    */
-    
+    ```
+-   `cursorConnection` represents a Field that follows the
+    [Relay Cursor Connections](https://facebook.github.io/relay/graphql/connections.htm) specification
+    ```graphql
+    query {
+       users(first: 10, after: "user::1234") {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+    ```
+    ```kotlin
     Kraph {
         cursorConnection("users", first = 10, after = "user::1234") {   
             edges {
@@ -152,11 +211,14 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
             }
         }
     }
-```
+    ```
+
 #### Request/Query String
-- `toRequestString()` is used for generating request JSON body for POST method.
-- `toGraphQueryString()` will give you the formatted GraphQuery string. This is very useful for debugging.
-```kotlin
+
+-   `toRequestString()` will generate a JSON body to send in POST request.
+-   `toGraphQueryString()` will give you the formatted GraphQL string. This is
+    very useful for debugging.
+    ```kotlin
     val query = Kraph {
         query {
             fieldObject("users") {
@@ -166,26 +228,30 @@ If you are not familiar with GraphQL syntax, We recommended to read on this [spe
             }
         }
     }    
-    
+
     println(query.toRequestString())
     /*
-    * Result: {"query": "query {\nnotes {\nid\ncreatedDate\ncontent\nauthor {\nname\navatarUrl(size: 100)\n}\n}\n}", "variables": null, "operationName": null}
-    */
+     * Result:
+     * {"query": "query {\nnotes {\nid\ncreatedDate\ncontent\nauthor {\nname\navatarUrl(size: 100)\n}\n}\n}", "variables": null, "operationName": null}
+     */
     println(query.toGraphQueryString())
     /*
-    * Result: 
-    * query {
-    *   notes {
-    *     id
-    *     createdDate
-    *     content
-    *     author {
-    *       name
-    *       avatarUrl(size: 100)
-    *     }
-    *   }
-    * }
-    */
-```
+     * Result:
+     * query {
+     *   notes {
+     *     id
+     *     createdDate
+     *     content
+     *     author {
+     *       name
+     *       avatarUrl(size: 100)
+     *     }
+     *   }
+     * }
+     */
+    ```
+
 ### Contributing to Kraph
-We use Github issues for tracking bugs and requests. Any feedback and/or PRs is welcome.
+
+We use Github issues for tracking bugs and requests.
+Any feedback and/or PRs is welcome.
