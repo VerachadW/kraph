@@ -66,18 +66,17 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[2].selectionSet!!.fields[1].name, equalTo("email"))
             }
             it("should be able to print the request for network call") {
-                assertThat(query.toRequestString(), equalTo("{\"query\": \"query getAllNotes {\\nnotes {\\nid\\ncontent\\nauthor {\\nname\\nemail\\n}\\navatarUrl(size: 100)\\n}\\n}\", \"variables\": null, \"operationName\": \"getAllNotes\"}"))
+                assertThat(query.toRequestString(), equalTo("{\"query\": \"query getAllNotes { notes { id content author { name email } avatarUrl (size: 100) } }\", \"variables\": null, \"operationName\": \"getAllNotes\"}"))
             }
             it("should be able to print GraphQL query content with pretty format") {
-                assertThat(query.toGraphQueryString(), equalTo("query getAllNotes {\n  notes {\n    id\n    content\n    author {\n      name\n      email\n    }\n    avatarUrl(size: 100)\n  }\n}"))
+                assertThat(query.toGraphQueryString(), equalTo("query getAllNotes {\n  notes {\n    id\n    content\n    author {\n      name\n      email\n    }\n    avatarUrl (size: 100)\n  }\n}"))
             }
         }
         given("sample query with no field in selection set") {
             it("should throw NoFieldsInSelectionSetException") {
                 assertThat({
                     Kraph {
-                        query {
-                        }
+                        query { }
                     }
                 }, throws(noFieldInSelectionSetMessageMatcher("query")))
             }

@@ -5,11 +5,13 @@ package me.lazmaid.kraph.lang
  */
 
 internal class Document(internal val operation: Operation) : GraphQLNode() {
-    override fun print(prettyFormat: Boolean, previousLevel: Int): String {
-        val operationNamePart = operation.name?.let {
-            "\"$it\""
-        }
-        val variablesPart = null
-        return "{\"query\": \"${operation.print(prettyFormat, previousLevel)}\", \"variables\": $variablesPart, \"operationName\": $operationNamePart}"
+    internal val variables: Variables = Variables()
+    override fun print(
+        format: PrintFormat,
+        previousLevel: Int
+    ): String {
+        val operationNamePart = operation.name?.let{ "\"$it\"" }
+        val variablesPart = variables.print()
+        return "{\"query\": \"${operation.print(PrintFormat.JSON, previousLevel)}\", \"variables\": $variablesPart, \"operationName\": $operationNamePart}"
     }
 }

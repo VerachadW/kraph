@@ -12,278 +12,219 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
 class GraphQLPrintSpek : Spek({
-
-    describe("Argument print function") {
-        given("id as argument and value as 1") {
-            val node = Argument(mapOf("id" to 1))
-            on("print pretty") {
-                it("should print (id: 1)") {
-                    assertThat(node.print(true, 0), equalTo("(id: 1)"))
+    data class Expectation(val normal: String, val pretty: String, val json: String)
+    describe("Argument") {
+        val tests = listOf(
+            Triple(
+                mapOf("id" to 1),
+                "a single number argument",
+                Expectation("(id: 1)", "(id: 1)", "(id: 1)")
+            ),
+            Triple(
+                mapOf("money" to 123.45),
+                "a single decimal argument",
+                Expectation("(money: 123.45)", "(money: 123.45)", "(money: 123.45)")
+            ),
+            Triple(
+                mapOf("isCancel" to false),
+                "a single boolean argument",
+                Expectation("(isCancel: false)", "(isCancel: false)", "(isCancel: false)")
+            ),
+            Triple(
+                mapOf("id" to 1, "title" to "Kraph"),
+                "a number and a string argument",
+                Expectation(
+                    "(id: 1, title: \"Kraph\")",
+                    "(id: 1, title: \"Kraph\")",
+                    "(id: 1, title: \\\"Kraph\\\")"
+                )
+            ),
+            Triple(
+                mapOf("user" to mapOf("name" to "John Doe", "email" to "john.doe@test.com")),
+                "an object argument",
+                Expectation(
+                    "(user: {name: \"John Doe\", email: \"john.doe@test.com\"})",
+                    "(user: {name: \"John Doe\", email: \"john.doe@test.com\"})",
+                    "(user: {name: \\\"John Doe\\\", email: \\\"john.doe@test.com\\\"})"
+                )
+            ),
+            Triple(
+                mapOf("users" to
+                    listOf(
+                        mapOf("name" to "user1", "email" to "user1@test.com"),
+                        mapOf("name" to "user2", "email" to "user2@test.com")
+                    )
+                ),
+                "an array of objects argument",
+                Expectation(
+                    "(users: [{name: \"user1\", email: \"user1@test.com\"}, {name: \"user2\", email: \"user2@test.com\"}])",
+                    "(users: [{name: \"user1\", email: \"user1@test.com\"}, {name: \"user2\", email: \"user2@test.com\"}])",
+                    "(users: [{name: \\\"user1\\\", email: \\\"user1@test.com\\\"}, {name: \\\"user2\\\", email: \\\"user2@test.com\\\"}])"
+                )
+            )
+        )
+        for((args, title, expectation) in tests) {
+            val arguments = Argument(args)
+            given(title) {
+                it("should print correctly in NORMAL mode") {
+                    assertThat(arguments.print(PrintFormat.NORMAL, 0), equalTo(expectation.normal))
                 }
-            }
-            on("print normal") {
-                it("should print (id: 1)") {
-                    assertThat(node.print(false, 0), equalTo("(id: 1)"))
+                it("should print correctly in PRETTY mode") {
+                    assertThat(arguments.print(PrintFormat.PRETTY, 0), equalTo(expectation.pretty))
                 }
-            }
-        }
-        given("money as argument and value as 123.45") {
-            val node = Argument(mapOf("money" to 123.45))
-            on("print pretty") {
-                it("should print (money: 123.45)") {
-                    assertThat(node.print(true, 0), equalTo("(money: 123.45)"))
-                }
-            }
-            on("print normal") {
-                it("should print (money: 123.45)") {
-                    assertThat(node.print(false, 0), equalTo("(money: 123.45)"))
-                }
-            }
-        }
-        given("isCancel as argument and value as false") {
-            val node = Argument(mapOf("isCancel" to false))
-            on("print pretty") {
-                it("should print (isCancel: false)") {
-                    assertThat(node.print(true, 0), equalTo("(isCancel: false)"))
-                }
-            }
-            on("print normal") {
-                it("should print (isCancel: false)") {
-                    assertThat(node.print(false, 0), equalTo("(isCancel: false)"))
-                }
-            }
-        }
-        given("id and title as arguments and value as 1 and Kraph") {
-            val node = Argument(mapOf("id" to 1, "title" to "Kraph"))
-            on("print pretty") {
-                it("should print (id: 1, title: \"Kraph\")") {
-                    assertThat(node.print(true, 0), equalTo("(id: 1, title: \"Kraph\")"))
-                }
-            }
-            on("print normal") {
-                it("should print (id: 1, title: \\\"Kraph\\\")") {
-                    assertThat(node.print(false, 0), equalTo("(id: 1, title: \\\"Kraph\\\")"))
-                }
-            }
-        }
-        given("an array of string as argument") {
-            val node = Argument(mapOf("titles" to listOf("title1", "title2")))
-            on("print pretty") {
-                it("should print (titles: [\"title1\", \"title2\"]") {
-                    assertThat(node.print(true, 0), equalTo("(titles: [\"title1\", \"title2\"])"))
-                }
-            }
-            on("print normal") {
-                it("should print (titles: [\\\"title1\\\", \\\"title2\\\"]") {
-                    assertThat(node.print(false, 0), equalTo("(titles: [\\\"title1\\\", \\\"title2\\\"])"))
-                }
-            }
-        }
-        given("an user object as argument") {
-            val user = mapOf("name" to "John Doe", "email" to "john.doe@test.com")
-            val node = Argument(mapOf("user" to user))
-            on("print pretty") {
-                it("should print (user: {\"name\": \"John Doe\", \"email\": \"john.doe@test.com\"})") {
-                    assertThat(node.print(true, 0), equalTo("(user: {\"name\": \"John Doe\", \"email\": \"john.doe@test.com\"})"))
-                }
-            }
-            on("print normal") {
-                it("should print (user: {\\\"name\\\": \\\"John Doe\\\", \\\"email\\\": \\\"john.doe@test.com\\\"})") {
-                    assertThat(node.print(false, 0), equalTo("(user: {\\\"name\\\": \\\"John Doe\\\", \\\"email\\\": \\\"john.doe@test.com\\\"})"))
-                }
-            }
-        }
-        given("an array of user object as argument") {
-            val user1 = mapOf("name" to "user1", "email" to "user1@test.com")
-            val user2 = mapOf("name" to "user2", "email" to "user2@test.com")
-            val node = Argument(mapOf("users" to listOf(user1, user2)))
-            on("print pretty") {
-                it("should print (users: [{\"name\": \"user1\", \"email\": \"user1@test.com\"}, {\"name\": \"user2\", \"email\": \"user2@test.com\"}])") {
-                    assertThat(node.print(true, 0), equalTo("(users: [{\"name\": \"user1\", \"email\": \"user1@test.com\"}, {\"name\": \"user2\", \"email\": \"user2@test.com\"}])"))
-                }
-            }
-            on("print normal") {
-                it("should print (users: [{\\\"name\\\": \\\"user1\\\", \\\"email\\\": \\\"user1@test.com\\\"}, {\\\"name\": \\\"user2\\\", \\\"email\\\": \\\"user2@test.com\\\"}])") {
-                    assertThat(node.print(false, 0), equalTo("(users: [{\\\"name\\\": \\\"user1\\\", \\\"email\\\": \\\"user1@test.com\\\"}, {\\\"name\\\": \\\"user2\\\", \\\"email\\\": \\\"user2@test.com\\\"}])"))
+                it("should print correctly in JSON mode") {
+                    assertThat(arguments.print(PrintFormat.JSON, 0), equalTo(expectation.json))
                 }
             }
         }
     }
-    describe("SelectionSet print function") {
-        given("two fields; id and title") {
-            val fields = listOf(Field("id"), Field("title"))
-            val node = SelectionSet(fields)
-            on("print pretty") {
-                it("should print {\n  id\n  title\n}") {
-                    assertThat(node.print(true, 0), equalTo("{\n  id\n  title\n}"))
+    describe("SelectionSet") {
+        val tests = listOf(
+            Triple(
+                listOf(Field("id"), Field("title")),
+                "two fields; id and title",
+                Expectation(
+                    "{ id title }",
+                    "{\n  id\n  title\n}",
+                    "{ id title }"
+                )
+            ),
+            Triple(
+                listOf(Field("id"), Field("title"), Field("assignee", selectionSet = SelectionSet(listOf(Field("name"), Field("email"))))),
+                "three fields; id, title, and assignee which contains name and email",
+                Expectation(
+                    "{ id title assignee { name email } }",
+                    "{\n  id\n  title\n  assignee {\n    name\n    email\n  }\n}",
+                    "{ id title assignee { name email } }"
+                )
+            )
+            // TODO: add tests for fragment syntax once fragments use GraphQL fragments
+        )
+        for((args, title, expectation) in tests) {
+            val selectionSet = SelectionSet(args)
+            given(title) {
+                it("should print correctly in NORMAL mode") {
+                    assertThat(selectionSet.print(PrintFormat.NORMAL, 0), equalTo(expectation.normal))
                 }
-            }
-            on("print normal") {
-                it("should print {id title}") {
-                    assertThat(node.print(false, 0), equalTo("{\\nid\\ntitle\\n}"))
+                it("should print correctly in PRETTY mode") {
+                    assertThat(selectionSet.print(PrintFormat.PRETTY, 0), equalTo(expectation.pretty))
                 }
-            }
-        }
-        given("three fields; id, title, and assignee which contains name and email") {
-            val assigneeSet = SelectionSet(listOf(Field("name"), Field("email")))
-            val assigneeField = Field("assignee", selectionSet = assigneeSet)
-            val fields = listOf(Field("id"), Field("title"), assigneeField)
-            val node = SelectionSet(fields)
-            on("print pretty") {
-                it("should print {\n  id\n  title\n  assignee {\n    name\n    email\n  }\n}") {
-                    assertThat(node.print(true, 0), equalTo("{\n  id\n  title\n  assignee {\n    name\n    email\n  }\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print {\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}") {
-                    assertThat(node.print(false, 0), equalTo("{\\nid\\ntitle\\nassignee {\\nname\\nemail\\n}\\n}"))
+                it("should print correctly in JSON mode") {
+                    assertThat(selectionSet.print(PrintFormat.JSON, 0), equalTo(expectation.json))
                 }
             }
         }
     }
-    describe("Mutation print function") {
-        given("name registerUser with email and password as argument and payload contains id and token") {
+    describe("Mutation") {
+        given("name RegisterUser with email and password as argument and payload contains id and token") {
             val argNode = InputArgument(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
             val setNode = SelectionSet(listOf(Field("id"), Field("token")))
-            val node = Mutation("registerUser", argNode, setNode)
-            on("print pretty") {
-                it("should print registerUser(input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }){\n  id\n  token\n}") {
-                    assertThat(node.print(true, 0), equalTo("registerUser(input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\n  id\n  token\n}"))
-                }
+            val node = Mutation("RegisterUser", argNode, setNode)
+            it("should print correctly in NORMAL mode") {
+                assertThat(node.print(PrintFormat.NORMAL, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) { id token }"))
             }
-            on("print normal") {
-                it("should print registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }){ id token }") {
-                    assertThat(node.print(false, 0), equalTo("registerUser(input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) {\\nid\\ntoken\\n}"))
+            it("should print correctly in PRETTY mode") {
+                assertThat(node.print(PrintFormat.PRETTY, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\n  id\n  token\n}"))
+            }
+            it("should print correctly in JSON mode") {
+                assertThat(node.print(PrintFormat.JSON, 0), equalTo("RegisterUser (input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) { id token }"))
+            }
+        }
+    }
+    describe("Field") {
+        val tests = listOf(
+            Triple(Field("id"), "name id", Expectation("id", "id", "id")),
+            Triple(
+                Field("avatarSize", Argument(mapOf("size" to 20))),
+                "name avatarSize and size argument with value as 20",
+                Expectation(
+                    "avatarSize (size: 20)",
+                    "avatarSize (size: 20)",
+                    "avatarSize (size: 20)"
+                )
+            ),
+            Triple(
+                Field("assignee", selectionSet = SelectionSet(listOf(Field("name"), Field("email")))),
+                "name assignee and containing name and email",
+                Expectation(
+                    "assignee { name email }",
+                    "assignee {\n  name\n  email\n}",
+                    "assignee { name email }"
+                )
+            ),
+            Triple(
+                Field("user", Argument(mapOf("id" to 10)), SelectionSet(listOf(Field("name"), Field("email")))),
+                "name user and id argument with value as 10 and containing name and email",
+                Expectation(
+                    "user (id: 10) { name email }",
+                    "user (id: 10) {\n  name\n  email\n}",
+                    "user (id: 10) { name email }"
+                )
+            )
+        )
+        for((field, title, expectation) in tests) {
+            given(title) {
+                it("should print correctly in NORMAL mode") {
+                    assertThat(field.print(PrintFormat.NORMAL, 0), equalTo(expectation.normal))
+                }
+                it("should print correctly in PRETTY mode") {
+                    assertThat(field.print(PrintFormat.PRETTY, 0), equalTo(expectation.pretty))
+                }
+                it("should print correctly in JSON mode") {
+                    assertThat(field.print(PrintFormat.JSON, 0), equalTo(expectation.json))
                 }
             }
         }
     }
-    describe("Field print function") {
-        given("name id") {
-            val node = Field("id")
-            on("print pretty") {
-                it("should print id") {
-                    assertThat(node.print(true, 0), equalTo("id"))
+    val tests = listOf(
+        Triple(
+            Operation(OperationType.QUERY, SelectionSet(listOf(Field("id")))),
+            "type query and a field named id",
+            Expectation(
+                "query { id }",
+                "query {\n  id\n}",
+                "query { id }"
+            )
+        ),
+        Triple(
+            Operation(OperationType.QUERY, name = "getTask", selectionSet = SelectionSet(listOf(Field("id")))),
+            "type query with name \"getTask\" and field id",
+            Expectation(
+                "query getTask { id }",
+                "query getTask {\n  id\n}",
+                "query getTask { id }"
+            )
+        ),
+        Triple(
+            Operation(OperationType.QUERY, name = "getTask", arguments = Argument(mapOf("id" to 1234)), selectionSet = SelectionSet(listOf(Field("title")))),
+            "type query with name \"getTask\" and id(1234) as argument and field title",
+            Expectation(
+                "query getTask (id: 1234) { title }",
+                "query getTask (id: 1234) {\n  title\n}",
+                "query getTask (id: 1234) { title }"
+            )
+        )
+    )
+    describe("Operation") {
+        for((operation, title, expectation) in tests) {
+            given(title) {
+                it("should print correctly in NORMAL mode") {
+                    assertThat(operation.print(PrintFormat.NORMAL, 0), equalTo(expectation.normal))
                 }
-            }
-            on("print normal") {
-                it("should print id") {
-                    assertThat(node.print(false, 0), equalTo("id"))
+                it("should print correctly in PRETTY mode") {
+                    assertThat(operation.print(PrintFormat.PRETTY, 0), equalTo(expectation.pretty))
                 }
-            }
-        }
-        given("name avatarSize and size argument with value as 20") {
-            val argNode = Argument(mapOf("size" to 20))
-            val node = Field("avatarSize", arguments = argNode)
-            on("print pretty") {
-                it("should print avatarSize(size: 20)") {
-                    assertThat(node.print(true, 0), equalTo("avatarSize(size: 20)"))
-                }
-            }
-            on("print normal") {
-                it("should print avatarSize(size: 20)") {
-                    assertThat(node.print(false, 0), equalTo("avatarSize(size: 20)"))
-                }
-            }
-        }
-        given("name assignee that contains name and email") {
-            val setNode = SelectionSet(listOf(Field("name"), Field("email")))
-            val node = Field("assignee", selectionSet = setNode)
-            on("print pretty") {
-                it("should print assignee {\n  name\n  email\n}") {
-                    assertThat(node.print(true, 0), equalTo("assignee {\n  name\n  email\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print assignee {\\nname\\nemail\\n}") {
-                    assertThat(node.print(false, 0), equalTo("assignee {\\nname\\nemail\\n}"))
-                }
-            }
-        }
-        given("name user and id argument with value as 10 and contains name and email") {
-            val argNode = Argument(mapOf("id" to 10))
-            val setNode = SelectionSet(listOf(Field("name"), Field("email")))
-            val node = Field("user", argNode, setNode)
-            on("print pretty") {
-                it("should print user(id: 10) {\n  name\n  email\n") {
-                    assertThat(node.print(true, 0), equalTo("user(id: 10) {\n  name\n  email\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print user(id: 10) {\\nname\\nemail\\n}") {
-                    assertThat(node.print(false, 0), equalTo("user(id: 10) {\\nname\\nemail\\n}"))
+                it("should print correctly in JSON mode") {
+                    assertThat(operation.print(PrintFormat.JSON, 0), equalTo(expectation.json))
                 }
             }
         }
     }
-    describe("Operation print function") {
-        given("query type and field named id") {
-            val node = Operation(OperationType.QUERY, SelectionSet(listOf(Field("id"))))
-            on("print pretty") {
-                it("should print query {\n  id\n}") {
-                    assertThat(node.print(true, 0), equalTo("query {\n  id\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print query {\\nid\\n}") {
-                    assertThat(node.print(false, 0), equalTo("query {\\nid\\n}"))
-                }
-            }
-        }
-        given("query type with name \"getTask\" and field id") {
-            val node = Operation(OperationType.QUERY, name = "getTask", selectionSet = SelectionSet(listOf(Field("id"))))
-            on("print pretty") {
-                it("should print query getTask {\n  id\n}") {
-                    assertThat(node.print(true, 0), equalTo("query getTask {\n  id\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print query getTask {\\nid\\n}") {
-                    assertThat(node.print(false, 0), equalTo("query getTask {\\nid\\n}"))
-                }
-            }
-        }
-        given("query type with name \"getTask\" and id(1234) as argument and field title") {
-            val argNode = Argument(mapOf("id" to 1234))
-            val node = Operation(OperationType.QUERY, name = "getTask", arguments = argNode, selectionSet= SelectionSet(listOf(Field("title"))))
-            on("print pretty") {
-                it("should print query getTask(id: 1234) {\n  title\n}") {
-                    assertThat(node.print(true, 0), equalTo("query getTask(id: 1234) {\n  title\n}"))
-                }
-            }
-            on("print normal") {
-                it("should print query getTask(id: 1234) {\\ntitle\\n}") {
-                    assertThat(node.print(false, 0), equalTo("query getTask(id: 1234) {\\ntitle\\n}"))
-                }
-            }
-        }
-    }
-    describe("Document print function") {
-        given("document with simple query") {
-            val queryNode = Operation(OperationType.QUERY, selectionSet = SelectionSet(listOf(Field("id"))))
-            val node = Document(queryNode)
-            on("print pretty") {
-                it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
-                    assertThat(node.print(true, 0), equalTo("{\"query\": \"query {\n  id\n}\", \"variables\": null, \"operationName\": null}"))
-                }
-            }
-            on("print normal") {
-                it("should print document {\"query\":\"query { id }\", \"variables\": null, \"operationName\": null}") {
-                    assertThat(node.print(false, 0), equalTo("{\"query\": \"query {\\nid\\n}\", \"variables\": null, \"operationName\": null}"))
-                }
-            }
-        }
-        given("document with query named getAllTasks") {
-            val queryNode = Operation(OperationType.QUERY, name = "getAllTasks", selectionSet = SelectionSet(listOf(Field("id"))))
-            val node = Document(queryNode)
-            on("print pretty") {
-                it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
-                    assertThat(node.print(true, 0), equalTo("{\"query\": \"query getAllTasks {\n  id\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
-                }
-            }
-            on("print normal") {
-                it("should print document {\"query\":\"query getAllTasks { id }\", \"variables\": null, \"operationName\": \"getAllTasks\"}") {
-                    assertThat(node.print(false, 0), equalTo("{\"query\": \"query getAllTasks {\\nid\\n}\", \"variables\": null, \"operationName\": \"getAllTasks\"}"))
+    describe("Document") {
+        for((operation, title, expectation) in tests) {
+            given(title) {
+                it("should print always JSON format in the JSON wrapper") {
+                    assertThat(Document(operation).print(PrintFormat.NORMAL, 0), equalTo("{\"query\": \"${expectation.json}\", \"variables\": null, \"operationName\": ${operation.name?.let {"\"$it\""} ?: "null"}}"))
                 }
             }
         }

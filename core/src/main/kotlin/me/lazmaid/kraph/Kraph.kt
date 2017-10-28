@@ -38,8 +38,12 @@ class Kraph(f: Kraph.() -> Unit) {
         return set
     }
 
-    fun toGraphQueryString() = document.operation.print(true, 0)
-    fun toRequestString() = document.print(false, 0)
+    fun toGraphQueryString() = document.operation.print(PrintFormat.PRETTY, 0)
+    fun toRequestString() = document.print(PrintFormat.JSON, 0)
+
+    fun requestQueryString() = document.operation.print(PrintFormat.NORMAL, 0)
+    fun requestVariableString() = document.variables.print()
+    fun requestOperationName() = document.operation.name
 
     inner open class FieldBuilder {
         internal val fields = arrayListOf<Field>()
