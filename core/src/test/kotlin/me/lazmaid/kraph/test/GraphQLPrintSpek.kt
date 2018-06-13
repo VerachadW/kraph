@@ -2,14 +2,13 @@ package me.lazmaid.kraph.test
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import me.lazmaid.kraph.lang.*
 import me.lazmaid.kraph.lang.relay.InputArgument
 import me.lazmaid.kraph.lang.relay.Mutation
-import me.lazmaid.kraph.lang.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
 
 class GraphQLPrintSpek : Spek({
     data class Expectation(val normal: String, val pretty: String, val json: String)
@@ -224,7 +223,8 @@ class GraphQLPrintSpek : Spek({
         for((operation, title, expectation) in tests) {
             given(title) {
                 it("should print always JSON format in the JSON wrapper") {
-                    assertThat(Document(operation).print(PrintFormat.NORMAL, 0), equalTo("{\"query\": \"${expectation.json}\", \"variables\": null, \"operationName\": ${operation.name?.let {"\"$it\""} ?: "null"}}"))
+                    assertThat(Document(operation, Variables()).print(PrintFormat.NORMAL, 0),
+                            equalTo("{\"query\": \"${expectation.json}\", \"variables\": null, \"operationName\": ${operation.name?.let {"\"$it\""} ?: "null"}}"))
                 }
             }
         }

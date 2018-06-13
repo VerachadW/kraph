@@ -1,5 +1,8 @@
 package me.lazmaid.kraph.lang
 
+import me.lazmaid.kraph.types.KraphVariable
+import me.lazmaid.kraph.types.KraphVariableType
+
 /**
  * Created by vwongsawangt on 8/6/2017 AD.
  */
@@ -19,6 +22,14 @@ internal sealed class DataEntry {
 
     class BooleanData(private val value: Boolean) : DataEntry() {
         override fun print(format: PrintFormat) = value.toString()
+    }
+
+    class VariableData(private val value: KraphVariable) : DataEntry() {
+        override fun print(format: PrintFormat) = value.dollarName
+    }
+
+    class VariableType(private val value: KraphVariableType) : DataEntry() {
+        override fun print(format: PrintFormat) = value.value
     }
 
     class StringData(private val value: String) : DataEntry() {

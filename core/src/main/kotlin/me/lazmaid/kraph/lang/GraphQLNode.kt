@@ -1,5 +1,8 @@
 package me.lazmaid.kraph.lang
 
+import me.lazmaid.kraph.types.KraphVariable
+import me.lazmaid.kraph.types.KraphVariableType
+
 abstract internal class GraphQLNode {
     var level = 0
 
@@ -30,9 +33,11 @@ abstract internal class GraphQLNode {
                 is Float    -> DataEntry.DecimalNumberData(value.toDouble())
                 is Boolean  -> DataEntry.BooleanData(value)
                 is Double   -> DataEntry.DecimalNumberData(value)
+                is KraphVariable -> DataEntry.VariableData(value)
+                is KraphVariableType -> DataEntry.VariableType(value)
                 is List<*>  -> convertToArrayData(value)
                 is Map<*,*> -> convertToObjectData(value as Map<String, *>)
-                else        -> throw RuntimeException("Unsupported Type")
+                else        -> throw RuntimeException("Unsupported Type: $value")
             }
 }
 

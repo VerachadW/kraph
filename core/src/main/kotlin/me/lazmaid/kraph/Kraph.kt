@@ -2,6 +2,8 @@ package me.lazmaid.kraph
 
 import me.lazmaid.kraph.lang.*
 import me.lazmaid.kraph.lang.relay.*
+import me.lazmaid.kraph.types.KraphVariable
+import me.lazmaid.kraph.types.KraphVariableType
 
 /**
  * Created by VerachadW on 9/19/2016 AD.
@@ -14,6 +16,7 @@ typealias NodeBlock = Kraph.NodeBuilder.() -> Unit
 class Kraph(f: Kraph.() -> Unit) {
 
     internal lateinit var document: Document
+    internal val variables: Variables = Variables()
 
     init {
         f.invoke(this)
@@ -21,12 +24,12 @@ class Kraph(f: Kraph.() -> Unit) {
 
     fun query(name: String? = null, builder: FieldBlock) {
         val set = createSelectionSet("query", builder)
-        document = Document(Operation(OperationType.QUERY, selectionSet = set, name = name))
+        document = Document(Operation(OperationType.QUERY, selectionSet = set, name = name, arguments = variables.asArgument()), variables)
     }
 
     fun mutation(name: String? = null, builder: FieldBlock) {
         val set = createSelectionSet("mutation", builder)
-        document = Document(Operation(OperationType.MUTATION, selectionSet = set, name = name))
+        document = Document(Operation(OperationType.MUTATION, selectionSet = set, name = name, arguments = variables.asArgument()), variables)
     }
 
     private fun createSelectionSet(name: String, f: FieldBlock): SelectionSet {
@@ -42,7 +45,7 @@ class Kraph(f: Kraph.() -> Unit) {
     fun toRequestString() = document.print(PrintFormat.JSON, 0)
 
     fun requestQueryString() = document.operation.print(PrintFormat.NORMAL, 0)
-    fun requestVariableString() = document.variables.print()
+    fun requestVariableString() = document.variables.print(PrintFormat.JSON, 0)
     fun requestOperationName() = document.operation.name
 
     inner open class FieldBuilder {
@@ -59,6 +62,11 @@ class Kraph(f: Kraph.() -> Unit) {
         fun fragment(name: String) {
             fragments[name]?.invoke(this) ?: throw NoSuchFragmentException("No fragment named \"$name\" has been defined.")
         }
+
+        fun variable(name: String, type: String, jsonValue: String): KraphVariable =
+            KraphVariable(name, KraphVariableType(type), jsonValue).also {
+                variables.variables[name] = it
+            }
 
         fun cursorConnection(name: String, first: Int = -1, last: Int = -1,
                              before: String? = null, after: String? = null,
