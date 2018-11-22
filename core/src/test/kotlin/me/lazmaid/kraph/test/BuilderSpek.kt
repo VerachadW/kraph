@@ -1,20 +1,18 @@
-package com.taskworld.kraph.test
+package me.lazmaid.kraph.test
 
 import com.natpryce.hamkrest.*
 import com.natpryce.hamkrest.assertion.assertThat
-import com.taskworld.kraph.Kraph
-import com.taskworld.kraph.NoFieldsInSelectionSetException
-import com.taskworld.kraph.lang.OperationType
-import com.taskworld.kraph.lang.relay.CursorConnection
-import com.taskworld.kraph.lang.relay.PageInfo
+import me.lazmaid.kraph.Kraph
+import me.lazmaid.kraph.NoFieldsInSelectionSetException
+import me.lazmaid.kraph.NoSuchFragmentException
+import me.lazmaid.kraph.lang.OperationType
+import me.lazmaid.kraph.lang.relay.CursorConnection
+import me.lazmaid.kraph.lang.relay.PageInfo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
-import org.junit.platform.runner.JUnitPlatform
-import org.junit.runner.RunWith
 
-@RunWith(JUnitPlatform::class)
 class BuilderSpek : Spek({
     describe("Kraph Query DSL Builder") {
         given("sample query") {
@@ -35,13 +33,13 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.type, isA(equalTo(OperationType.QUERY)))
             }
             it("should have only one field inside query") {
-                assertThat(query.document.operation.selectionSet.fields, hasSize(equalTo(1)))
+                assertThat(query.document.operation.selectionSet.fields.size, equalTo(1))
             }
             it("should have field named notes inside query") {
                 assertThat(query.document.operation.selectionSet.fields[0].name, equalTo("notes"))
             }
             it("should have four fields inside note object") {
-                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields, hasSize(equalTo(4)))
+                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields.size, equalTo(4))
             }
             it("should have field named id inside notes object") {
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[0].name, equalTo("id"))
@@ -59,7 +57,7 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[3].arguments!!.args["size"] as Int, equalTo(100))
             }
             it("should have two fields inside author object") {
-                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[2].selectionSet!!.fields, hasSize(equalTo(2)))
+                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[2].selectionSet!!.fields.size, equalTo(2))
             }
             it("should have field named name inside author object") {
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[2].selectionSet!!.fields[0].name, equalTo("name"))
@@ -68,18 +66,17 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[2].selectionSet!!.fields[1].name, equalTo("email"))
             }
             it("should be able to print the request for network call") {
-                assertThat(query.toRequestString(), equalTo("{\"query\": \"query getAllNotes {\\nnotes {\\nid\\ncontent\\nauthor {\\nname\\nemail\\n}\\navatarUrl(size: 100)\\n}\\n}\", \"variables\": null, \"operationName\": \"getAllNotes\"}"))
+                assertThat(query.toRequestString(), equalTo("{\"query\": \"query getAllNotes { notes { id content author { name email } avatarUrl (size: 100) } }\", \"variables\": null, \"operationName\": \"getAllNotes\"}"))
             }
             it("should be able to print GraphQL query content with pretty format") {
-                assertThat(query.toGraphQueryString(), equalTo("query getAllNotes {\n  notes {\n    id\n    content\n    author {\n      name\n      email\n    }\n    avatarUrl(size: 100)\n  }\n}"))
+                assertThat(query.toGraphQueryString(), equalTo("query getAllNotes {\n  notes {\n    id\n    content\n    author {\n      name\n      email\n    }\n    avatarUrl (size: 100)\n  }\n}"))
             }
         }
         given("sample query with no field in selection set") {
             it("should throw NoFieldsInSelectionSetException") {
                 assertThat({
                     Kraph {
-                        query {
-                        }
+                        query { }
                     }
                 }, throws(noFieldInSelectionSetMessageMatcher("query")))
             }
@@ -108,13 +105,13 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.type, isA(equalTo(OperationType.MUTATION)))
             }
             it("should have only 1 mutation") {
-                assertThat(query.document.operation.selectionSet.fields, hasSize(equalTo(1)))
+                assertThat(query.document.operation.selectionSet.fields.size, equalTo(1))
             }
             it("should have mutation named registerUser") {
                 assertThat(query.document.operation.selectionSet.fields[0].name, equalTo("registerUser"))
             }
             it("should have 3 arguments in registerUser mutation") {
-                assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args.entries, hasSize(equalTo(3)))
+                assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args.entries.size, equalTo(3))
             }
             it("should have argument in registerUser mutation with named email and value as abcd@efgh.com") {
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["email"] as String, equalTo("abcd@efgh.com"))
@@ -126,7 +123,7 @@ class BuilderSpek : Spek({
                 assertThat(query.document.operation.selectionSet.fields[0].arguments!!.args["age"] as Int, equalTo(30))
             }
             it("should contains 2 field in registerUser payload") {
-                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields, hasSize(equalTo(2)))
+                assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields.size, equalTo(2))
             }
             it("should have id field in registerUser payload") {
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[0].name, equalTo("id"))
@@ -242,11 +239,47 @@ class BuilderSpek : Spek({
                 }, throws<NoFieldsInSelectionSetException>(pageInfoNoValidFieldMessageMatcher))
             }
         }
+        given("sample query using fragments") {
+            it("should throw a NoSuchFragmentException when the fragment doesn't exist") {
+                assertThat({
+                    Kraph {
+                        query {
+                            fieldObject("user") {
+                                fragment("FakeFragment")
+                            }
+                        }
+                    }
+                }, throws<NoSuchFragmentException>(noSuchFragmentMessageMatcher))
+            }
+            it("should expand the fields in the fragment when the fragment exists") {
+                Kraph.defineFragment("UserFragment") {
+                    field("name")
+                    field("email")
+                }
+                val query = Kraph {
+                    query {
+                        fieldObject("user") {
+                            fragment("UserFragment")
+                        }
+                    }
+                }
+                it("should have a field named user inside query") {
+                    assertThat(query.document.operation.selectionSet.fields[0].name, equalTo("user"))
+                }
+                it("should have a field named name inside user") {
+                    assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[0].name, equalTo("name"))
+                }
+                it("should have a field named email inside user") {
+                    assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[1].name, equalTo("email"))
+                }
+            }
+        }
     }
 })
 
 val cursorEmptyArgumentsMessageMatcher = Matcher(Exception::checkExceptionMessage, "There must be at least 1 argument for Cursor Connection")
 val pageInfoNoValidFieldMessageMatcher = Matcher(Exception::checkExceptionMessage, "Selection Set must contain hasNextPage and/or hasPreviousPage field")
+val noSuchFragmentMessageMatcher = Matcher(Exception::checkExceptionMessage, "No fragment named \"FakeFragment\" has been defined.")
 fun noFieldInSelectionSetMessageMatcher(name: String) = Matcher(Exception::checkExceptionMessage, "No field elements inside \"$name\" block")
 
 fun Exception.checkExceptionMessage(message: String) = this.message == message

@@ -1,4 +1,4 @@
-package com.taskworld.kraph
+package me.lazmaid.kraph
 
 /**
  * Created by VerachadW on 10/4/2016 AD.
