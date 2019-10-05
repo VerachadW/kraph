@@ -72,6 +72,23 @@ class BuilderSpek : Spek({
                 assertThat(query.toGraphQueryString(), equalTo("query getAllNotes {\n  notes {\n    id\n    content\n    author {\n      name\n      email\n    }\n    avatarUrl (size: 100)\n  }\n}"))
             }
         }
+        given("sample query with aliases") {
+            val query = Kraph {
+                query("getAllNotes") {
+                    fieldObject("notes", alias = "aliasedNotes") {
+                        field("id", alias = "aliasedId")
+                    }
+                }
+            }
+            it("should be able to print the request for network call") {
+                assertThat(
+                    query.toRequestString(),
+                    equalTo(
+                        "{\"query\": \"query getAllNotes { aliasedNotes: notes { aliasedId: id } }\", \"variables\": null, \"operationName\": \"getAllNotes\"}"
+                    )
+                )
+            }
+        }
         given("sample query with no field in selection set") {
             it("should throw NoFieldsInSelectionSetException") {
                 assertThat({
@@ -95,7 +112,7 @@ class BuilderSpek : Spek({
         given("sample mutation") {
             val query = Kraph {
                 mutation {
-                    func("registerUser", mapOf("email" to "abcd@efgh.com", "password" to "abcd1234", "age" to 30)) {
+                    func("registerUser", args = mapOf("email" to "abcd@efgh.com", "password" to "abcd1234", "age" to 30)) {
                         field("id")
                         field("token")
                     }
@@ -130,6 +147,22 @@ class BuilderSpek : Spek({
             }
             it("should have token field in mutation payload") {
                 assertThat(query.document.operation.selectionSet.fields[0].selectionSet!!.fields[1].name, equalTo("token"))
+            }
+        }
+        given("sample mutation with alias") {
+            val query = Kraph {
+                mutation {
+                    func("registerUser", alias = "aliasedRegisterUser", args = mapOf("email" to "abcd@efgh.com")) {
+                        field("id")
+                    }
+                }
+            }
+            it("should be able to print the request for network call") {
+                assertThat(query.toRequestString(),
+                    equalTo(
+                    "{\"query\": \"mutation { aliasedRegisterUser: registerUser (input: { email: \\\"abcd@efgh.com\\\" }) { id } }\", \"variables\": null, \"operationName\": null}"
+                    )
+                )
             }
         }
         given("sample mutation with no field in selection set") {
@@ -205,17 +238,17 @@ class BuilderSpek : Spek({
         given("sample query with cursor cursorConnection without arguments") {
             it("should throw IllegalArgumentException with message \"There must be at least 1 argument for Cursor Connection\"") {
                 assertThat({
-                Kraph {
-                    query {
-                        cursorConnection("users") {
-                            edges {
-                                node {
-                                    field("title")
+                    Kraph {
+                        query {
+                            cursorConnection("users") {
+                                edges {
+                                    node {
+                                        field("title")
+                                    }
                                 }
                             }
                         }
                     }
-                }
                 }, throws<IllegalArgumentException>(cursorEmptyArgumentsMessageMatcher))
             }
         }

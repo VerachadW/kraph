@@ -12,7 +12,7 @@ class RequestSpek : Spek({
     describe("Kraph Query Request format printers") {
         val query = Kraph {
             query("GetUserId") {
-                field("user", mapOf("name" to variable("name", "User", "{\"name\": \"UserName\"}"))) {
+                field("user", args = mapOf("name" to variable("name", "User", "{\"name\": \"UserName\"}"))) {
                     field("id")
                 }
             }

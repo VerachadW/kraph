@@ -132,7 +132,7 @@ class GraphQLPrintSpek : Spek({
         given("name RegisterUser with email and password and type of registrarion as argument and payload contains id and token") {
             val argNode = InputArgument(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234", "type" to Type.EMAIL))
             val setNode = SelectionSet(listOf(Field("id"), Field("token")))
-            val node = Mutation("RegisterUser", argNode, setNode)
+            val node = Mutation("RegisterUser", arguments = argNode, selectionSet = setNode)
             it("should print correctly in NORMAL mode") {
                 assertThat(node.print(PrintFormat.NORMAL, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\", type: EMAIL }) { id token }"))
             }
@@ -148,7 +148,7 @@ class GraphQLPrintSpek : Spek({
         val tests = listOf(
             Triple(Field("id"), "name id", Expectation("id", "id", "id")),
             Triple(
-                Field("avatarSize", Argument(mapOf("size" to 20))),
+                Field("avatarSize", arguments = Argument(mapOf("size" to 20))),
                 "name avatarSize and size argument with value as 20",
                 Expectation(
                     "avatarSize (size: 20)",
@@ -166,7 +166,7 @@ class GraphQLPrintSpek : Spek({
                 )
             ),
             Triple(
-                Field("user", Argument(mapOf("id" to 10)), SelectionSet(listOf(Field("name"), Field("email")))),
+                Field("user", arguments = Argument(mapOf("id" to 10)), selectionSet = SelectionSet(listOf(Field("name"), Field("email")))),
                 "name user and id argument with value as 10 and containing name and email",
                 Expectation(
                     "user (id: 10) { name email }",
