@@ -1,5 +1,6 @@
 package me.lazmaid.kraph.lang
 
+
 /**
  * Created by VerachadW on 10/2/2016 AD.
  */
@@ -16,7 +17,11 @@ internal class Operation(
     ): String {
         val namePart = name?.let{ " $it" } ?: ""
         val argumentPart = arguments?.print(format, previousLevel)?.let{ " $it" } ?: ""
-        return "${type.name.toLowerCase()}$namePart$argumentPart ${selectionSet.print(format, previousLevel)}"
+        val operationType = when(type) {
+            OperationType.QUERY -> "query"
+            OperationType.MUTATION -> "mutation"
+        }
+        return "$operationType$namePart$argumentPart ${selectionSet.print(format, previousLevel)}"
     }
 }
 
