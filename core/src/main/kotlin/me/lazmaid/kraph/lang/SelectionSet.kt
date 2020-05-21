@@ -11,7 +11,7 @@ internal class SelectionSet(internal val fields: List<Field>) : GraphQLNode() {
         previousLevel: Int
     ): String {
         val nl = getNewLineString(format)
-        if (format == PrintFormat.PRETTY) level = previousLevel + 1 else level = 0
+        level = if (format == PrintFormat.PRETTY) previousLevel + 1 else 0
         val fieldStr = fields.joinToString(nl) { getIndentString(level) + it.print(format, level) }
         return "{${ nl + fieldStr + nl + getIndentString(previousLevel) }}"
     }

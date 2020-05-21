@@ -48,7 +48,7 @@ class Kraph(f: Kraph.() -> Unit) {
     fun requestVariableString() = document.variables.print(PrintFormat.JSON, 0)
     fun requestOperationName() = document.operation.name
 
-    inner open class FieldBuilder {
+    open inner class FieldBuilder {
         internal val fields = arrayListOf<Field>()
 
         fun fieldObject(name: String, args: Map<String, Any>? = null, builder: FieldBlock) {
@@ -72,8 +72,8 @@ class Kraph(f: Kraph.() -> Unit) {
                              before: String? = null, after: String? = null,
                              builder: CursorBlock) {
             val argsMap = linkedMapOf<String, Any>()
-            if (first != -1) argsMap.put("first", first)
-            if (last != -1) argsMap.put("last", last)
+            if (first != -1) argsMap["first"] = first
+            if (last != -1) argsMap["last"] = last
             before?.let { argsMap.put("before", it) }
             after?.let { argsMap.put("after", it) }
 
