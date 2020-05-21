@@ -8,10 +8,10 @@ import me.lazmaid.kraph.lang.SelectionSet
  * Created by VerachadW on 10/2/2016 AD.
  */
 
-internal class Node(name: String, additionalFields: List<Field>) : Field(name) {
+internal class Node(name: String, alias: String?, additionalFields: List<Field>) : Field(name, alias) {
     init {
         selectionSet = SelectionSet(additionalFields.toMutableList().apply {
-           add(0, Field("id"))
+            add(0, Field("id"))
         })
     }
 }

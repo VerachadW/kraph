@@ -100,11 +100,12 @@ First, let's see what Kraph provides for you.
     technically no differences, `fieldObject` may be chosen for clarity to indicate
     that a field must contain another set of nested fields as an argument.
     Both of them take a `Map<String, Any>` that maps Kotlin data types to the
-    GraphQL data types for input objects.
+    GraphQL data types for input objects. You can also specify an alias using `alias` to change
+    the name of the returned field.
     ```graphql
     query {
       users {
-        name
+        nick: name
         email
         avatarUrl(size: 100)
       }
@@ -114,11 +115,38 @@ First, let's see what Kraph provides for you.
     Kraph {
         query {
             fieldObject("users") {
-                field("name")
+                field("name", alias = "nick")
                 field("email")
                 field("avatarUrl", args = mapOf("size" to 100))
             }
         }
+    }
+    ```
+
+-   `fragment` provides a mechanism for creating GraphQL Fragments. To use a fragment
+    in a query requires two steps. The first is to define the fragment, letting
+    Kraph know how to handle it later:
+    ```graphql
+    fragment UserFragment on User {
+      name
+      email
+      avatarUrl(size: 100)
+    }
+    ```
+    ```kotlin
+    Kraph.defineFragment("UserFragment") {
+        field("name")
+        field("email")
+        field("avatarUrl", mapOf("size" to 100))
+    }
+    ```
+    Then, when you are creating your query, you can simply use the fragment and
+    its fields will be expanded:
+    ```graphql
+    query {
+      users {
+        ...UserFragment
+      }
     }
     ```
 

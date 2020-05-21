@@ -60,6 +60,20 @@ class GraphQLPrintSpek : Spek({
                     "(users: [{name: \"user1\", email: \"user1@test.com\"}, {name: \"user2\", email: \"user2@test.com\"}])",
                     "(users: [{name: \\\"user1\\\", email: \\\"user1@test.com\\\"}, {name: \\\"user2\\\", email: \\\"user2@test.com\\\"}])"
                 )
+            ),
+            Triple(
+                mapOf("type" to Type.EMAIL),
+                "a single enum argument",
+                Expectation("(type: EMAIL)", "(type: EMAIL)", "(type: EMAIL)")
+            ),
+            Triple(
+                mapOf("user" to mapOf("name" to "John Doe", "email" to "john.doe@test.com", "type" to Type.EMAIL)),
+                "an object argument with enum",
+                Expectation(
+                    "(user: {name: \"John Doe\", email: \"john.doe@test.com\", type: EMAIL})",
+                    "(user: {name: \"John Doe\", email: \"john.doe@test.com\", type: EMAIL})",
+                    "(user: {name: \\\"John Doe\\\", email: \\\"john.doe@test.com\\\", type: EMAIL})"
+                )
             )
         )
         for((args, title, expectation) in tests) {
@@ -115,18 +129,18 @@ class GraphQLPrintSpek : Spek({
         }
     }
     describe("Mutation") {
-        given("name RegisterUser with email and password as argument and payload contains id and token") {
-            val argNode = InputArgument(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234"))
+        given("name RegisterUser with email and password and type of registrarion as argument and payload contains id and token") {
+            val argNode = InputArgument(mapOf("email" to "abcd@efgh.com", "password" to "abcd1234", "type" to Type.EMAIL))
             val setNode = SelectionSet(listOf(Field("id"), Field("token")))
-            val node = Mutation("RegisterUser", argNode, setNode)
+            val node = Mutation("RegisterUser", arguments = argNode, selectionSet = setNode)
             it("should print correctly in NORMAL mode") {
-                assertThat(node.print(PrintFormat.NORMAL, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) { id token }"))
+                assertThat(node.print(PrintFormat.NORMAL, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\", type: EMAIL }) { id token }"))
             }
             it("should print correctly in PRETTY mode") {
-                assertThat(node.print(PrintFormat.PRETTY, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\" }) {\n  id\n  token\n}"))
+                assertThat(node.print(PrintFormat.PRETTY, 0), equalTo("RegisterUser (input: { email: \"abcd@efgh.com\", password: \"abcd1234\", type: EMAIL }) {\n  id\n  token\n}"))
             }
             it("should print correctly in JSON mode") {
-                assertThat(node.print(PrintFormat.JSON, 0), equalTo("RegisterUser (input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\" }) { id token }"))
+                assertThat(node.print(PrintFormat.JSON, 0), equalTo("RegisterUser (input: { email: \\\"abcd@efgh.com\\\", password: \\\"abcd1234\\\", type: EMAIL }) { id token }"))
             }
         }
     }
@@ -134,7 +148,7 @@ class GraphQLPrintSpek : Spek({
         val tests = listOf(
             Triple(Field("id"), "name id", Expectation("id", "id", "id")),
             Triple(
-                Field("avatarSize", Argument(mapOf("size" to 20))),
+                Field("avatarSize", arguments = Argument(mapOf("size" to 20))),
                 "name avatarSize and size argument with value as 20",
                 Expectation(
                     "avatarSize (size: 20)",
@@ -152,7 +166,7 @@ class GraphQLPrintSpek : Spek({
                 )
             ),
             Triple(
-                Field("user", Argument(mapOf("id" to 10)), SelectionSet(listOf(Field("name"), Field("email")))),
+                Field("user", arguments = Argument(mapOf("id" to 10)), selectionSet = SelectionSet(listOf(Field("name"), Field("email")))),
                 "name user and id argument with value as 10 and containing name and email",
                 Expectation(
                     "user (id: 10) { name email }",
@@ -202,6 +216,16 @@ class GraphQLPrintSpek : Spek({
                 "query getTask (id: 1234) {\n  title\n}",
                 "query getTask (id: 1234) { title }"
             )
+        ),
+        Triple(
+            Operation(OperationType.QUERY, name = "getTask", arguments = Argument(mapOf("id" to 1234, "type" to Type.EMAIL)), selectionSet = SelectionSet(listOf(Field("title")))),
+            "type query with name \"getTask\" and id(1234), type(EMAIL) as argument and field title",
+            Expectation(
+                "query getTask (id: 1234, type: EMAIL) { title }",
+                "query getTask (id: 1234, type: EMAIL) {\n  title\n}",
+                "query getTask (id: 1234, type: EMAIL) { title }"
+
+            )
         )
     )
     describe("Operation") {
@@ -229,4 +253,8 @@ class GraphQLPrintSpek : Spek({
             }
         }
     }
-})
+}) {
+    private enum class Type {
+        EMAIL
+    }
+}

@@ -51,12 +51,12 @@ class Kraph(f: Kraph.() -> Unit) {
     open inner class FieldBuilder {
         internal val fields = arrayListOf<Field>()
 
-        fun fieldObject(name: String, args: Map<String, Any>? = null, builder: FieldBlock) {
-            addField(name, args, builder)
+        fun fieldObject(name: String, alias: String? = null, args: Map<String, Any>? = null, builder: FieldBlock) {
+            addField(name, alias, args, builder)
         }
 
-        fun field(name: String, args: Map<String, Any>? = null, builder: FieldBlock? = null) {
-            addField(name, args, builder)
+        fun field(name: String, alias: String? = null, args: Map<String, Any>? = null, builder: FieldBlock? = null) {
+            addField(name, alias, args, builder)
         }
 
         fun fragment(name: String) {
@@ -87,16 +87,16 @@ class Kraph(f: Kraph.() -> Unit) {
             fields += CursorConnection(name, Argument(argsMap), SelectionSet(selection.fields))
         }
 
-        fun func(name: String, args: Map<String, Any>, builder: FieldBlock) {
-            fields += Mutation(name, InputArgument(args), createSelectionSet(name, builder))
+        fun func(name: String, alias: String? = null, args: Map<String, Any>, builder: FieldBlock) {
+            fields += Mutation(name, alias, InputArgument(args), createSelectionSet(name, builder))
         }
 
-        protected fun addField(name: String, args: Map<String, Any>? = null, builder: FieldBlock? = null) {
+        protected fun addField(name: String, alias: String? = null, args: Map<String, Any>? = null, builder: FieldBlock? = null) {
             val argNode = args?.let(::Argument)
             val selectionSet = builder?.let {
                 createSelectionSet(name, builder)
             }
-            fields += Field(name, arguments = argNode, selectionSet = selectionSet)
+            fields += Field(name, alias, arguments = argNode, selectionSet = selectionSet)
         }
     }
 

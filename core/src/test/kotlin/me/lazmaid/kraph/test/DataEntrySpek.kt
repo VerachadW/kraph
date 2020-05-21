@@ -27,7 +27,8 @@ class DataEntrySpek : Spek({
                 "{name: \"John Doe\", age: 18}",
                 "{name: \\\"John Doe\\\", age: 18}"
             )
-        )
+        ),
+        Pair(DataEntry.EnumData(Type.SHORT), Expectation("SHORT", "SHORT", "SHORT"))
     )
     for((node, expectation) in tests) {
         describe("${node::class.simpleName}") {
@@ -42,4 +43,8 @@ class DataEntrySpek : Spek({
             }
         }
     }
-})
+}) {
+    private enum class Type {
+        SHORT
+    }
+}

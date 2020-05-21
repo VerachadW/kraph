@@ -34,5 +34,23 @@ fun main(args: Array<String>) {
     println("Query: ${mutation.toGraphQueryString()}")
     println("Request Body: ${ mutation.toRequestString() }")
 
+    // Sample query with alias
+    val alias = Kraph {
+        query {
+            fieldObject("notes", "example") {
+                field("id")
+                field("createdDate")
+                field("content")
+                fieldObject("author") {
+                    field("name")
+                    field("avatarUrl", args = mapOf("size" to 100))
+                }
+            }
+        }
+    }
+
+    println("Query: ${alias.toGraphQueryString()}")
+    println("Request Body: ${ alias.toRequestString() }")
+
 
 }

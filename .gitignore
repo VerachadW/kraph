@@ -2,6 +2,7 @@
 
 .idea/
 .gradle
+**/out
 
 build
 out

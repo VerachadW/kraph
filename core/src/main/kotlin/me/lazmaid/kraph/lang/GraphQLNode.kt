@@ -37,6 +37,7 @@ internal abstract class GraphQLNode {
                 is KraphVariableType -> DataEntry.VariableType(value)
                 is List<*>  -> convertToArrayData(value)
                 is Map<*,*> -> convertToObjectData(value as Map<String, *>)
+                is Enum<*>  -> DataEntry.EnumData(value)
                 else        -> throw RuntimeException("Unsupported Type: $value")
             }
 }
