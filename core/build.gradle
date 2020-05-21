@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        publish_version = '0.6.0'
+        publish_version = '0.6.1'
 
         bintray_plugin_version = '0.3.4'
 
@@ -8,7 +8,7 @@ buildscript {
         hamkrest_version = '1.4.2.2'
         junit_version = '4.12'
         junit_platform_version = '1.0.0'
-
+        jacoco_version = '0.8.5'
     }
     repositories {
         mavenCentral()
@@ -80,25 +80,24 @@ project.afterEvaluate {
     // configure jacoco to analyze the junitPlatformTest task
     jacoco {
         // this tool version is compatible with
-        toolVersion = "0.7.6.201602180812"
+        toolVersion = "$jacoco_version"
         applyTo junitPlatformTestTask
     }
 
     // create junit platform jacoco task
     project.task(type: JacocoReport, "junitPlatformJacocoReport",
             {
-                sourceDirectories = files("./src/main")
-                classDirectories = files("$buildDir/classes/main")
+                sourceDirectories.from = files("./src/main")
+                classDirectories.from = files("$buildDir/classes/main")
                 executionData junitPlatformTestTask
             })
 }
 
-
 jacocoTestReport {
-    additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
-    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-    classDirectories = files(sourceSets.main.output)
-    executionData = files("$buildDir/jacoco/junitPlatformTest.exec")
+    additionalSourceDirs(files(sourceSets.main.allSource.srcDirs))
+    sourceDirectories.from = files(sourceSets.main.allSource.srcDirs)
+    classDirectories.from = files(sourceSets.main.output)
+    executionData.from = files("$buildDir/jacoco/junitPlatformTest.exec")
     onlyIf = {
         true
     }
@@ -106,13 +105,5 @@ jacocoTestReport {
         html.enabled = true
         xml.enabled = true
         csv.enabled = false
-    }
-
-    doFirst {
-        new File("$buildDir/classes/main").eachFileRecurse { file ->
-            if (file.name.contains('$$')) {
-                file.renameTo(file.path.replace('$$', '$'))
-            }
-        }
     }
 }

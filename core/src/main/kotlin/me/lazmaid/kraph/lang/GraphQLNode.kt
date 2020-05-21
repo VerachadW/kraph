@@ -3,7 +3,7 @@ package me.lazmaid.kraph.lang
 import me.lazmaid.kraph.types.KraphVariable
 import me.lazmaid.kraph.types.KraphVariableType
 
-abstract internal class GraphQLNode {
+internal abstract class GraphQLNode {
     var level = 0
 
     abstract fun print(format: PrintFormat, previousLevel: Int): String
